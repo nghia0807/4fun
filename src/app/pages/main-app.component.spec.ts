@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NoPageComponent } from './no-page.component';
+import { MainAppComponent } from './main-app.component';
 
-describe('NoPageComponent', () => {
-  let component: NoPageComponent;
-  let fixture: ComponentFixture<NoPageComponent>;
+describe('MainAppComponent', () => {
+  let component: MainAppComponent;
+  let fixture: ComponentFixture<MainAppComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NoPageComponent]
+      imports: [MainAppComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(NoPageComponent);
+    fixture = TestBed.createComponent(MainAppComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -8,30 +8,21 @@
 
 form {
     width: 100%;
-    max-width: 300px;
-    padding: 20px;
+    max-width: 600px;
+    padding: 50px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-nz-form-item {
-    margin-bottom: 16px;
+button {
+    margin-left: 10px;
 }
 
-.login-form-margin {
-    margin-bottom: 16px;
+.ant-select.ant-select-in-form-item.phone-select {
+    width: 70px;
 }
 
-.login-form-forgot {
-    float: right;
-}
-
-.login-form-button {
-    width: 100%;
-}
-
-.register-now {
-    margin-top: 16px;
-    text-align: center;
+.register-area {
+    margin-bottom: 8px;
 }
