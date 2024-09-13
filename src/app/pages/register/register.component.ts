@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -19,7 +19,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ 
+  imports: [
     NzFormModule,
     RouterOutlet,
     RouterLink,
@@ -36,7 +36,7 @@ export class RegisterComponent {
     email: FormControl<string>;
     password: FormControl<string>;
     confirm: FormControl<string>;
-    comment: FormControl<string>;
+    phonenumber: FormControl<string>;
   }>;
 
   submitForm(): void {
@@ -74,13 +74,16 @@ export class RegisterComponent {
     return {};
   };
 
-  constructor(private fb: NonNullableFormBuilder) {
+  constructor(
+    private fb: NonNullableFormBuilder,
+    private router: Router
+  ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required], [this.userNameAsyncValidator]],
       email: ['', [Validators.email, Validators.required]],
       password: ['', [Validators.required]],
       confirm: ['', [this.confirmValidator]],
-      comment: ['', [Validators.required]]
+      phonenumber: ['', [Validators.required]]
     });
   }
 }

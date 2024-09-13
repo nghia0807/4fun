@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -22,7 +22,8 @@ import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
     NzCheckboxModule,
     NzNotificationModule,
     RouterLink,
-    NzMessageComponent
+    NzMessageComponent,
+    RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -36,7 +37,8 @@ export class LoginComponent {
 
   constructor(
     private fb: NonNullableFormBuilder,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
