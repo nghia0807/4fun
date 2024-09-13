@@ -1,0 +1,13 @@
+.flex-item {
+    height: 54px;
+    background-color: var(--ant-primary-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.even {
+    background-color: var(--ant-primary-5);
+}

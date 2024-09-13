@@ -9,6 +9,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { monitorEventLoopDelay } from 'perf_hooks';
 import { MonitorComponent } from './pages/monitor/monitor.component';
 import { NopageComponent } from './pages/nopage/nopage.component';
+import { DoctorComponent } from './pages/doctor/doctor.component';
 
 export const routes: Routes = [
   {
@@ -29,12 +30,21 @@ export const routes: Routes = [
     component: MainAppComponent,
     children: [
       {
+        path: '',
+        redirectTo: 'welcome',
+        pathMatch:'full'
+      },
+      {
         path: 'welcome',
         component: WelcomeComponent
       },
       {
         path: 'monitor',
         component: MonitorComponent,
+      },
+      {
+        path: 'doctor',
+        component: DoctorComponent
       },
       {
         path: '**',
