@@ -1,0 +1,19 @@
+<nz-layout>
+  <nz-sider>
+    <h1 class="sider-title">Hi</h1>
+    <ul nz-menu>
+      <li nz-menu-item nzSelected routerLink="/main/welcome" routerLinkActive="active">Option 1</li>
+      <li nz-menu-item routerLink="/main/monitor" routerLinkActive="active">Option 2</li>
+      <li nz-menu-item routerLink="/main/nopage" routerLinkActive="active">Option 3</li>
+      <li nz-menu-item routerLink="/" (click)="" >Logout</li>
+    </ul>
+  </nz-sider>
+
+  <nz-layout>
+    <nz-header>Header</nz-header>
+    <nz-content>
+      <router-outlet></router-outlet>
+    </nz-content>
+    <nz-footer>Footer</nz-footer>
+  </nz-layout>
+</nz-layout>

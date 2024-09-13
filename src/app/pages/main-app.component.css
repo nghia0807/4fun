@@ -1,0 +1,56 @@
+:host {
+    text-align: center;
+    height: 100vh; /* Full height of the viewport */
+}
+
+nz-layout {
+    height: 100%;
+}
+
+nz-sider {
+    background: white;
+    color: #fff;
+    line-height: 120px;
+}
+
+nz-header,
+nz-footer {
+    background: #7dbcea;
+    color: #fff;
+    line-height: 1.5;
+}
+
+nz-content {
+    background: white;
+    color: #fff;
+    min-height: calc(100vh - 120px);
+    line-height: 120px;
+}
+
+.ant-layout, .ant-layout * {
+    box-sizing: border-box;
+    color: black;
+}
+
+nz-layout nz-layout,
+nz-layout:last-child {
+    margin: 0;
+    height: 100%;
+}
+
+nz-header, nz-footer, nz-content {
+    padding: 16px;
+}
+
+.sider-title {
+    text-align: center;
+    color: #000;
+    font-size: 40px;
+    padding: 16px 0;
+    margin: 0;
+    background-color: white;
+}
+
+ul[nz-menu] {
+    margin-top: 0;
+}
