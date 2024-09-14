@@ -1,13 +1,12 @@
-.flex-item {
-    height: 54px;
-    background-color: var(--ant-primary-6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
+.pagination {
+    margin-top: 20px;
+    text-align: center;
 }
 
-.even {
-    background-color: var(--ant-primary-5);
+nz-card {
+    width: 100%;
+}
+
+nz-card-meta {
+    margin: 16px 0;
 }

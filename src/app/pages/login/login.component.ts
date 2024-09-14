@@ -8,7 +8,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
-
+import { AuthService } from '../auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -38,7 +38,7 @@ export class LoginComponent {
   constructor(
     private fb: NonNullableFormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private authService: AuthService
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -61,6 +61,9 @@ export class LoginComponent {
   }
 
   onLogin() {
+    const userName = this.validateForm.value.userName ?? '';
+    const password = this.validateForm.value.password ?? '';
+    this.authService.login(userName, password);
     this.router.navigate(['/main/welcome']);
   }
 }

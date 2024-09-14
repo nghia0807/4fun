@@ -10,6 +10,7 @@ import { monitorEventLoopDelay } from 'perf_hooks';
 import { MonitorComponent } from './pages/monitor/monitor.component';
 import { NopageComponent } from './pages/nopage/nopage.component';
 import { DoctorComponent } from './pages/doctor/doctor.component';
+import { authGuard } from './pages/auth.guard';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,7 @@ export const routes: Routes = [
   {
     path: 'main',
     component: MainAppComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: '',

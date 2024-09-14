@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, ActivatedRoute } from '@ang
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 @Component({
   selector: 'app-main-app',
   standalone: true,
@@ -18,12 +19,14 @@ import { Router } from '@angular/router';
 })
 export class MainAppComponent {
   constructor(
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ){}
 
 
 
   logOut(){
+    this.authService.logout();
     this.router.navigate(['']);
   }
 }
