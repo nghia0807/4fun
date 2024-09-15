@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NzTableModule } from 'ng-zorro-antd/table';
+import { userData } from '../../../../data/data';
 
 interface appointment {
   key: string,
@@ -50,4 +51,10 @@ export class ListComponent {
       time: '0:00:00',
     }
   ]
+
+  constructor(
+    private appoinment: userData,
+  ){}
+
+  lists = this.appoinment.getAppointment;
 }
