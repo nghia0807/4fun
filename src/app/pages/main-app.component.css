@@ -38,11 +38,11 @@ nz-header {
 
 nz-footer {
     text-align: center;
-    background-color: #1fa6db;
+    background-color: #5252af;
     margin-top: auto;
 }
 
 nz-sider {
     flex: 0 0 auto;
-    background-color: #685a77;
+    background-color: #ffffff;
 }
