@@ -7,12 +7,9 @@ import { CommonModule } from '@angular/common';
 import { NzModalModule, NzModalService, NzModalRef } from 'ng-zorro-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { DoctorModalComponent } from './doctor-modal/doctor-modal.component';
-
-interface Doctor {
-  name: string;
-  specialization: string;
-  imageUrl: string;
-}
+import { Doctor, System } from '../../../data/data';
+import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
+import { concatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-doctor',
@@ -25,10 +22,12 @@ interface Doctor {
     NzPaginationModule,
     NzModalModule,
     NzButtonModule,
-    DoctorModalComponent
+    DoctorModalComponent,
+    NzMessageModule,
   ],
   templateUrl: './doctor.component.html',
-  styleUrl: './doctor.component.css'
+  styleUrl: './doctor.component.css',
+  providers: [System]
 })
 export class DoctorComponent implements OnInit {
   doctors: Doctor[] = [];
@@ -36,16 +35,14 @@ export class DoctorComponent implements OnInit {
   totalDoctors = 0;
 
   constructor(
-    private modalService: NzModalService
+    private modalService: NzModalService,
+    private data: System,
+    private message: NzMessageService
   ) { }
 
   ngOnInit() {
-    this.doctors = Array(100).fill(0).map((_, i) => ({
-      name: `Doctor ${i + 1}`,
-      specialization: `Specialization ${(i % 5) + 1}`,
-      imageUrl: `https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg`
-    }));
-    this.totalDoctors = this.doctors.length;
+    this.doctors = this.data.getListDoctor();
+    this.totalDoctors = this.data.getListNumber();
   }
 
   pageChanged(page: number) {
@@ -53,12 +50,13 @@ export class DoctorComponent implements OnInit {
   }
 
   showRegistrationModal(doctor: Doctor): void {
+
     const modal: NzModalRef = this.modalService.create({
-      nzTitle: `Đăng ký khám với ${doctor.name}`,
+      nzTitle: `You are registering with Dr.${doctor.name}`,
       nzContent: DoctorModalComponent,
-      // nzData: {
-      //   doctor: doctor
-      // },
+      nzData: {
+        doctor: doctor
+      },
       nzFooter: [
         {
           label: 'Hủy',
@@ -68,11 +66,19 @@ export class DoctorComponent implements OnInit {
           label: 'Đăng ký',
           type: 'primary',
           onClick: () => {
-            // Handle registration logic here
+            this.message
+              .loading('Action in progress', { nzDuration: 2500 })
+              .onClose!.pipe(
+                concatMap(() => this.message.success('Registering appointment', { nzDuration: 2500 }).onClose!),
+                concatMap(() => this.message.info('Registering is finished', { nzDuration: 2500 }).onClose!)
+              )
+              .subscribe(() => {
+                console.log('All completed!');
+              });
             modal.close();
           }
         }
-      ]      
+      ]
     });
   }
 }
