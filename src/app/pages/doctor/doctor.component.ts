@@ -56,9 +56,9 @@ export class DoctorComponent implements OnInit {
     const modal: NzModalRef = this.modalService.create({
       nzTitle: `Đăng ký khám với ${doctor.name}`,
       nzContent: DoctorModalComponent,
-      nzData: {
-        doctor: doctor
-      },
+      // nzData: {
+      //   doctor: doctor
+      // },
       nzFooter: [
         {
           label: 'Hủy',
