@@ -1,0 +1,33 @@
+.header {
+    padding: 0 20px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.user-info {
+    color: white;
+}
+
+.user-info a {
+    color: black;
+    text-decoration: none;
+}
+
+.user-info a:hover {
+    color: #494f54;
+}
+
+nz-dropdown-menu {
+    min-width: 200px;
+}
+
+[nz-menu-item] {
+    display: flex;
+    align-items: center;
+}
+
+[nz-menu-item] i {
+    margin-right: 8px;
+}

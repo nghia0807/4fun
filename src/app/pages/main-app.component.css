@@ -31,7 +31,7 @@ nz-content {
 }
 
 nz-header {
-    background: #1fa6db;
+    background: #5252af;
     padding: 0;
     text-align: center;
 }
@@ -44,5 +44,5 @@ nz-footer {
 
 nz-sider {
     flex: 0 0 auto;
-    background-color: white;
+    background-color: #685a77;
 }

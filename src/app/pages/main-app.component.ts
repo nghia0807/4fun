@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, ActivatedRoute } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { HeaderComponent } from './header/header.component';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { Router } from '@angular/router';
@@ -13,6 +14,7 @@ import { AuthService } from './auth.service';
     NzLayoutModule,
     NzMenuModule,
     RouterLinkActive,
+    HeaderComponent,
   ],
   templateUrl: './main-app.component.html',
   styleUrl: './main-app.component.css'
