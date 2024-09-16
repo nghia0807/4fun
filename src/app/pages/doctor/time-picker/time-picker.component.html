@@ -1,0 +1,14 @@
+<div class="date-picker-container">
+    <nz-date-picker (ngModelChange)="onDateChange($event)" [nzFormat]="'dd/MM/yyyy'" ngModel></nz-date-picker>
+</div>
+
+<div *ngIf="selectedDate" class="selected-date">
+    <p>Selected date: {{ selectedDate | date: 'fullDate' }}</p>
+</div>
+
+<div class="time-picker-container">
+    <div class="time-slot" *ngFor="let time of availableTimes" [class.selected]="time.selected"
+        (click)="onTimeSelect(time)">
+        {{ time.time }}
+    </div>
+</div>
