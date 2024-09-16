@@ -1,0 +1,27 @@
+<div class="header">
+    <div class="user-info">
+        <a nz-dropdown [nzDropdownMenu]="menu">
+            {{ user.name }} <i nz-icon nzType="down"></i>
+        </a>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+            <ul nz-menu>
+                <li nz-menu-item>
+                    <i nz-icon nzType="user" nzTheme="outline"></i>
+                    {{ user.name }}
+                </li>
+                <li nz-menu-item>
+                    <i nz-icon nzType="phone" nzTheme="outline"></i>
+                    {{ user.phone }}
+                </li>
+                <li nz-menu-item>
+                    <i nz-icon nzType="mail" nzTheme="outline"></i>
+                    {{ user.email }}
+                </li>
+                <li nz-menu-item>
+                    <i nz-icon nzType="home" nzTheme="outline"></i>
+                    {{ user.address }}
+                </li>
+            </ul>
+        </nz-dropdown-menu>
+    </div>
+</div>

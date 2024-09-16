@@ -3,14 +3,16 @@
     <h1 class="sider-title">Hi</h1>
     <ul nz-menu>
       <li nz-menu-item nzSelected routerLink="/main/welcome" routerLinkActive="active">Option 1</li>
-      <li nz-menu-item routerLink="/main/monitor" routerLinkActive="active">Option 2</li>
-      <li nz-menu-item routerLink="/main/nopage" routerLinkActive="active">Option 3</li>
-      <li nz-menu-item routerLink="/" (click)="" >Logout</li>
+      <li nz-menu-item routerLink="/main/doctor" routerLinkActive="active">Option 2</li>
+      <li nz-menu-item routerLink="/main/monitor" routerLinkActive="active">Option 3</li>
+      <li nz-menu-item routerLink="/" (click)="logOut()">Logout</li>
     </ul>
   </nz-sider>
 
   <nz-layout>
-    <nz-header>Header</nz-header>
+    <nz-header>
+      <app-header></app-header>
+    </nz-header>
     <nz-content>
       <router-outlet></router-outlet>
     </nz-content>

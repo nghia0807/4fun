@@ -1,0 +1,30 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+app-list,
+app-history-list {
+    width: 100%;
+    left: 0;
+    right: 0;
+}
+
+.top {
+    top: 0;
+    height: 50%;
+}
+
+.bottom {
+    bottom: 0;
+    height: 50%;
+}
+
+/* .top,
+.bottom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 50%;
+} */

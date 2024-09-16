@@ -1,56 +1,48 @@
-:host {
-    text-align: center;
-    height: 100vh; /* Full height of the viewport */
+.app-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-nz-layout {
-    height: 100%;
-}
-
-nz-sider {
-    background: white;
-    color: #fff;
-    line-height: 120px;
-}
-
-nz-header,
-nz-footer {
-    background: #7dbcea;
-    color: #fff;
-    line-height: 1.5;
-}
-
-nz-content {
-    background: white;
-    color: #fff;
-    min-height: calc(100vh - 120px);
-    line-height: 120px;
-}
-
-.ant-layout, .ant-layout * {
-    box-sizing: border-box;
-    color: black;
-}
-
-nz-layout nz-layout,
-nz-layout:last-child {
-    margin: 0;
-    height: 100%;
-}
-
-nz-header, nz-footer, nz-content {
-    padding: 16px;
+.logo {
+    height: 32px;
+    margin: 16px;
+    background: rgb(254, 254, 254);
 }
 
 .sider-title {
+    color: black;
     text-align: center;
-    color: #000;
-    font-size: 40px;
-    padding: 16px 0;
+    line-height: 32px;
     margin: 0;
-    background-color: white;
+    background: white;
 }
 
-ul[nz-menu] {
-    margin-top: 0;
+.right-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+nz-content {
+    flex: 1;
+    text-align: center;
+    padding: 24px;
+}
+
+nz-header {
+    background: #5252af;
+    padding: 0;
+    text-align: center;
+}
+
+nz-footer {
+    text-align: center;
+    background-color: #1fa6db;
+    margin-top: auto;
+}
+
+nz-sider {
+    flex: 0 0 auto;
+    background-color: #685a77;
 }

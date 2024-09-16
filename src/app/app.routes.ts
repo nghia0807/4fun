@@ -9,6 +9,8 @@ import { RegisterComponent } from './pages/register/register.component';
 import { monitorEventLoopDelay } from 'perf_hooks';
 import { MonitorComponent } from './pages/monitor/monitor.component';
 import { NopageComponent } from './pages/nopage/nopage.component';
+import { DoctorComponent } from './pages/doctor/doctor.component';
+import { authGuard } from './pages/auth.guard';
 
 export const routes: Routes = [
   {
@@ -27,7 +29,13 @@ export const routes: Routes = [
   {
     path: 'main',
     component: MainAppComponent,
+    canActivate: [authGuard],
     children: [
+      {
+        path: '',
+        redirectTo: 'welcome',
+        pathMatch:'full'
+      },
       {
         path: 'welcome',
         component: WelcomeComponent
@@ -35,6 +43,10 @@ export const routes: Routes = [
       {
         path: 'monitor',
         component: MonitorComponent,
+      },
+      {
+        path: 'doctor',
+        component: DoctorComponent
       },
       {
         path: '**',

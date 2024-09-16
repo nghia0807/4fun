@@ -50,14 +50,14 @@
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>Phone Number</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please add your phone number">
-        <input nz-input type="phone_number"/>
+        <input nz-input type="phonenumber" placeholder="phonenumber" formControlName="phonenumber"/>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control [nzOffset]="7" [nzSpan]="12">
         <button nz-button nzType="primary" [disabled]="!validateForm.valid">Submit</button>
         <button nz-button (click)="resetForm($event)">Reset</button>
-        <button nz-button routerLink="Login" nzType="primary"> Log in </button>
+        <button nz-button routerLink="/login" > Log in </button>
       </nz-form-control>
     </nz-form-item>
   </form>

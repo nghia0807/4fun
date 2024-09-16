@@ -1,0 +1,26 @@
+<nz-table #basicTable [nzData]="appointments">
+    <thead>
+        <tr>
+            <th>Key</th>
+            <th>Doctor</th>
+            <th>Room</th>
+            <th>Day</th>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (data of basicTable.data; track data) {
+        <tr>
+            <td>{{ data.key }}</td>
+            <td>{{ data.doctor }}</td>
+            <td>{{ data.room }}</td>
+            <td>{{ data.day }}</td>
+            <td>{{ data.month }}</td>
+            <td>{{ data.year }}</td>
+            <td>{{ data.time }}</td>
+        </tr>
+        }
+    </tbody>
+</nz-table>

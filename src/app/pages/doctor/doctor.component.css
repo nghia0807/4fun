@@ -1,0 +1,12 @@
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+nz-card {
+    width: 100%;
+}
+
+nz-card-meta {
+    margin: 16px 0;
+}
