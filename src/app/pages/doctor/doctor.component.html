@@ -1,6 +1,6 @@
 <div nz-row [nzGutter]="[16, 16]">
     <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="8" [nzLg]="6" [nzXl]="4"
-        *ngFor="let doctor of doctors | slice:(currentPage-1)*50:currentPage*50; let i = index">
+        *ngFor="let doctor of doctors | slice:(currentPage-1)*18:currentPage*18; let i = index">
         <nz-card [nzCover]="coverTemplate" [nzActions]="[actionChoose]">
             <nz-card-meta [nzTitle]="doctor.name" [nzDescription]="doctor.specialization"></nz-card-meta>
         </nz-card>
@@ -8,11 +8,11 @@
             <img alt="{{ doctor.name }}" src="{{ doctor.imageUrl }}" />
         </ng-template>
         <ng-template #actionChoose>
-            <span nz-icon nzType="plus-circle" nzTheme="outline" (click)="showRegistrationModal(doctor)">Regiter</span>
+            <span nz-icon nzType="plus-circle" nzTheme="outline" (click)="showRegistrationModal(doctor)">Register  </span>
         </ng-template>
     </div>
 </div>
 <div class="pagination">
-    <nz-pagination [nzPageIndex]="currentPage" [nzTotal]="totalDoctors" [nzPageSize]="50"
+    <nz-pagination [nzPageIndex]="currentPage" [nzTotal]="totalDoctors" [nzPageSize]="18"
         (nzPageIndexChange)="pageChanged($event)"></nz-pagination>
 </div>
