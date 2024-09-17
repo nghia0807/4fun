@@ -4,6 +4,15 @@
     min-height: 100vh;
 }
 
+app-filter-doctor {
+    text-align: center;
+}
+
+.filter {
+    padding-bottom: 10px;
+    width: 200px;
+}
+
 .content {
     flex: 1;
 }

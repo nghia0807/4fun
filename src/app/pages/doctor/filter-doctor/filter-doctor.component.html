@@ -1,0 +1,20 @@
+<nz-input-group [nzAddOnBefore]="addOnBeforeTemplate">
+    <input [(ngModel)]="searchTerm" placeholder="Search by name" (input)="onFilterChange()" />
+</nz-input-group>
+<ng-template #addOnBeforeTemplate>
+    <nz-select [(ngModel)]="selectedTag" (ngModelChange)="onFilterChange()">
+        <nz-option nzLabel="All faculties" nzValue="all"></nz-option>
+        <nz-option nzLabel="Department of Dermatology" nzValue="dl"></nz-option>
+        <nz-option nzLabel="Oncology Department" nzValue="ub"></nz-option>
+        <nz-option nzLabel="Pediatrics Department" nzValue="n"></nz-option>
+        <nz-option nzLabel="Neurology Department" nzValue="tk"></nz-option>
+        <nz-option nzLabel="Rheumatology Department" nzValue="xk"></nz-option>
+        <nz-option nzLabel="Ophthalmology Department" nzValue="m"></nz-option>
+        <nz-option nzLabel="Ear, Nose, and Throat Department" nzValue="tmh"></nz-option>
+        <nz-option nzLabel="Nephrology Department" nzValue="t"></nz-option>
+        <nz-option nzLabel="Hepatobiliary Department" nzValue="gm"></nz-option>
+        <nz-option nzLabel="Dentistry" nzValue="nk"></nz-option>
+        <nz-option nzLabel="Endocrinology Department" nzValue="nt"></nz-option>
+        <nz-option nzLabel="Nutrition Department" nzValue="dd"></nz-option>
+    </nz-select>
+</ng-template>

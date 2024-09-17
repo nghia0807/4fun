@@ -10,6 +10,7 @@ import { DoctorModalComponent } from './doctor-modal/doctor-modal.component';
 import { Doctor, System } from '../../../data/data';
 import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
 import { concatMap } from 'rxjs/operators';
+import { FilterDoctorComponent } from './filter-doctor/filter-doctor.component';
 
 @Component({
   selector: 'app-doctor',
@@ -24,6 +25,7 @@ import { concatMap } from 'rxjs/operators';
     NzButtonModule,
     DoctorModalComponent,
     NzMessageModule,
+    FilterDoctorComponent
   ],
   templateUrl: './doctor.component.html',
   styleUrl: './doctor.component.css',
@@ -31,8 +33,11 @@ import { concatMap } from 'rxjs/operators';
 })
 export class DoctorComponent implements OnInit {
   doctors: Doctor[] = [];
+  filteredDoctors: Doctor[] = [];
   currentPage = 1;
   totalDoctors = 0;
+  searchTerm: string = '';
+  selectedTag: string = '';
 
   constructor(
     private modalService: NzModalService,
@@ -43,6 +48,26 @@ export class DoctorComponent implements OnInit {
   ngOnInit() {
     this.doctors = this.data.getListDoctor();
     this.totalDoctors = this.data.getListNumber();
+    this.filterDoctors(); 
+  }
+
+  onFilterChanged(event: { searchTerm: string, tag: string }) {
+    this.searchTerm = event.searchTerm;
+    if (event.tag === 'all') {
+        this.selectedTag = '';
+    } else {
+        this.selectedTag = event.tag;
+    }
+    this.filterDoctors();
+}
+
+  filterDoctors() {
+    this.filteredDoctors = this.doctors.filter(doctor => {
+      const matchesName = this.searchTerm === '' || doctor.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesTag = this.selectedTag === '' || doctor.tag === this.selectedTag;
+      return matchesName && matchesTag;
+    });
+    this.totalDoctors = this.filteredDoctors.length;
   }
 
   pageChanged(page: number) {
