@@ -11,11 +11,8 @@ export class AuthService {
     return this.loggedIn;
   }
 
-  login(userName: string, password: string) {
-    //check username and password ở đây
-    if (userName == 'tam' && password == '123') {
+  login() {
       this.loggedIn = true;
-    }
   }
 
   logout() {
