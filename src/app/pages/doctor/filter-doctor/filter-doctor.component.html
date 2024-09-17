@@ -1,10 +1,8 @@
-
-
-<nz-input-group [nzAddOnBefore]="addOnBeforeTemplate" onchange="onFilterChange()">
+<nz-input-group [nzAddOnBefore]="addOnBeforeTemplate">
     <input [(ngModel)]="searchTerm" placeholder="Search by name" (input)="onFilterChange()" />
 </nz-input-group>
 <ng-template #addOnBeforeTemplate>
-    <nz-select [ngModel]="'all'" (ngModelChange)="onFilterChange()">
+    <nz-select [(ngModel)]="selectedTag" (ngModelChange)="onFilterChange()">
         <nz-option nzLabel="All faculties" nzValue="all"></nz-option>
         <nz-option nzLabel="Department of Dermatology" nzValue="dl"></nz-option>
         <nz-option nzLabel="Oncology Department" nzValue="ub"></nz-option>

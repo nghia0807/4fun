@@ -53,9 +53,13 @@ export class DoctorComponent implements OnInit {
 
   onFilterChanged(event: { searchTerm: string, tag: string }) {
     this.searchTerm = event.searchTerm;
-    this.selectedTag = event.tag;
+    if (event.tag === 'all') {
+        this.selectedTag = '';
+    } else {
+        this.selectedTag = event.tag;
+    }
     this.filterDoctors();
-  }
+}
 
   filterDoctors() {
     this.filteredDoctors = this.doctors.filter(doctor => {
