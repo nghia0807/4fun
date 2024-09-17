@@ -9,6 +9,9 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../auth.service';
+import { login } from './loginData'
+import { privateDecrypt } from 'crypto';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -28,6 +31,7 @@ import { AuthService } from '../auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
+
 export class LoginComponent {
   validateForm: FormGroup<{
     userName: FormControl<string>;
@@ -38,7 +42,8 @@ export class LoginComponent {
   constructor(
     private fb: NonNullableFormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private message: NzMessageService
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -63,7 +68,17 @@ export class LoginComponent {
   onLogin() {
     const userName = this.validateForm.value.userName ?? '';
     const password = this.validateForm.value.password ?? '';
-    this.authService.login(userName, password);
-    this.router.navigate(['/main/welcome']);
+    //this.authService.login(userName, password);
+    login(userName, password)
+    .then((result) => {
+      if(result.status === "success"){
+        this.authService.login();
+        this.router.navigate(['/main/welcome']);
+        this.message.success('Login successfully')
+        }
+        else{
+          this.message.error('Login failed')
+        }
+      })
   }
 }
