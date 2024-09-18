@@ -41,3 +41,8 @@ app-filter-doctor {
     flex-flow: row wrap;
     min-width: 0;
 }
+
+.ant-card-body {
+    padding: 24px;
+    height: 1000px;
+}
