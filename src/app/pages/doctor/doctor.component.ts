@@ -69,7 +69,7 @@ export class DoctorComponent implements OnInit {
             this.message
               .loading('Action in progress', { nzDuration: 2500 })
               .onClose!.pipe(
-                concatMap(() => this.message.success('Registering appointment', { nzDuration: 2500 }).onClose!),
+                concatMap(() => this.message.success('Registering appointment successfully', { nzDuration: 2500 }).onClose!),
                 concatMap(() => this.message.info('Registering is finished', { nzDuration: 2500 }).onClose!)
               )
               .subscribe(() => {
