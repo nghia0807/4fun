@@ -75,8 +75,7 @@ export class RegisterComponent {
   };
 
   constructor(
-    private fb: NonNullableFormBuilder,
-    private router: Router
+    private fb: NonNullableFormBuilder
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required], [this.userNameAsyncValidator]],
