@@ -17,7 +17,7 @@ export const submitRegister = (email: string, password: string, phoneNumber: str
         const userRef = ref(db, `users/${userID}`);
         set(userRef, {
           email: email,
-          password: password,
+          //password: password,
           phoneNumber: phoneNumber
         })
         .then(() => {
@@ -27,7 +27,7 @@ export const submitRegister = (email: string, password: string, phoneNumber: str
           console.log("Data saved failed", error);
         })
       }
-      
+
       return {
         status: "success",
         user: userID
