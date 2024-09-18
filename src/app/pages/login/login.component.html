@@ -1,8 +1,8 @@
 <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
     <nz-form-item>
-        <nz-form-control nzErrorTip="Please input your username!">
+        <nz-form-control nzHasFeedback nzErrorTip="The input is not valid E-mail!">
             <nz-input-group nzPrefixIcon="user">
-                <input type="email" nz-input formControlName="userName" placeholder="Username" />
+                <input email nz-input formControlName="userName" placeholder="Email" />
             </nz-input-group>
         </nz-form-control>
     </nz-form-item>

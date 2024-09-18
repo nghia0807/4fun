@@ -41,13 +41,13 @@ export class DoctorComponent implements OnInit {
 
   constructor(
     private modalService: NzModalService,
-    private data: System,
+    private system: System,
     private message: NzMessageService
   ) { }
 
   ngOnInit() {
-    this.doctors = this.data.getListDoctor();
-    this.totalDoctors = this.data.getListNumber();
+    this.doctors = this.system.getListDoctor();
+    this.totalDoctors = this.system.getListNumber();
     this.filterDoctors(); 
   }
 
