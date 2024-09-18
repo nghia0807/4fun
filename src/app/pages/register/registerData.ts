@@ -8,7 +8,7 @@ const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const db = getDatabase(app)
 
-export const register = (email: string, password: string, phoneNumber: string) => {
+export const submitRegister = (email: string, password: string, phoneNumber: string) => {
   return createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const userID = userCredential.user?.uid;
@@ -19,14 +19,25 @@ export const register = (email: string, password: string, phoneNumber: string) =
           email: email,
           password: password,
           phoneNumber: phoneNumber
-        }). then(() => {
+        })
+        .then(() => {
           console.log("Data saved succesfully");
-        }). catch(() => {
+        })
+        .catch((error) => {
           console.log("Data saved failed", error);
         })
       }
+      
+      return {
+        status: "success",
+        user: userID
+      };
     })
     .catch((error) => {
-      console.error("Error during registration", error);
+      return {
+        status: "error",
+        code: error.code,
+        message: error.message,
+      }
     })
 }

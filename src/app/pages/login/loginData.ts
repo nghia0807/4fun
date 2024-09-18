@@ -14,10 +14,10 @@ export const login = (email: string, pass: string) => {
   return setPersistence(auth, browserLocalPersistence).then(() => {
     return signInWithEmailAndPassword(auth, email, pass)
       .then((userCredential) => {
-        const email = userCredential.user;
+        const userID = userCredential.user;
         return {
           status: "success",
-          user: email,
+          user: userID
         };
       })
       .catch((error) => {
