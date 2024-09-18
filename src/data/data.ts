@@ -13,7 +13,6 @@ export interface Appointment {
 
 export interface User {
     name: string;
-    userName: string;
     phone: string;
     email: string;
     address: string;
@@ -31,11 +30,9 @@ export interface Doctor {
 })
 
 export class UserDataService {
-    constructor() { }
 
-    getUserName(): string {
-        return 'tam';
-    }
+
+    constructor() { }
 
     getName(): string {
         return 'Nguyen Duc Tam';
@@ -50,7 +47,7 @@ export class UserDataService {
     }
 
     getEmail(): string {
-        return 'email@gmail.com';
+        return "email@gmail.com";
     }
 
     getAppointments(): Appointment[] {
@@ -93,8 +90,8 @@ export class System {
             { name: 'huyen', specialization: 'Oncology', tag: 'ub', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
             { name: 'vui', specialization: 'Nephrology', tag: 't', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
             { name: 'phuong', specialization: 'Hepatobiliary', tag: 'gm', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' }
-        ];        
-    }    
+        ];
+    }
 
     getListNumber(): number {
         return this.getListDoctor().length;

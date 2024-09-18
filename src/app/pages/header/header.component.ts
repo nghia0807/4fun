@@ -13,7 +13,6 @@ import { UserDataService, User } from '../../../data/data';
 export class HeaderComponent implements OnInit {
   user: User = {
     name: '',
-    userName: '',
     phone: '',
     email: '',
     address: ''
@@ -25,7 +24,6 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.user = {
       name: this.data.getName(),
-      userName: this.data.getUserName(),
       phone: this.data.getPhoneNumber(),
       email: this.data.getEmail(),
       address: this.data.getAddress()
