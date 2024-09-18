@@ -15,6 +15,9 @@ import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { Observable, Observer } from 'rxjs';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { submitRegister } from './registerData';
+import { AuthService } from '../auth.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-register',
@@ -75,7 +78,10 @@ export class RegisterComponent {
   };
 
   constructor(
-    private fb: NonNullableFormBuilder
+    private fb: NonNullableFormBuilder,
+    private router: Router,
+    private authService: AuthService,
+    private message: NzMessageService
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required], [this.userNameAsyncValidator]],
@@ -85,4 +91,22 @@ export class RegisterComponent {
       phonenumber: ['', [Validators.required]]
     });
   }
+
+  onRegister() {
+    const email = this.validateForm.value.email ?? '';
+    const password = this.validateForm.value.password ?? '';
+    const phoneNumber = this.validateForm.value.phonenumber ?? '';
+
+    submitRegister(email, password, phoneNumber)
+      .then((result) => {
+        if(result.status === "success"){
+          this.authService.login();
+          this.router.navigate(['main/welcome']);
+          this.message.success('Register succesfully')
+        }
+        else{
+          this.message.error('Register failed')
+        }
+      })
+    }
 }
