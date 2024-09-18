@@ -10,14 +10,14 @@ import { firebaseConfig } from "../../../data/firebaseConfig";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-export const login = (user: string, pass: string) => {
+export const login = (email: string, pass: string) => {
   return setPersistence(auth, browserLocalPersistence).then(() => {
-    return signInWithEmailAndPassword(auth, user, pass)
+    return signInWithEmailAndPassword(auth, email, pass)
       .then((userCredential) => {
-        const user = userCredential.user;
+        const email = userCredential.user;
         return {
           status: "success",
-          user: user,
+          user: email,
         };
       })
       .catch((error) => {
