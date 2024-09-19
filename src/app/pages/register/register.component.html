@@ -16,7 +16,7 @@
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>E-mail</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="emailErrorTpl">
-        <input nz-input formControlName="email" placeholder="email" type="email" />
+        <input nz-input formControlName="email" placeholder="E-mail" type="email" />
         <ng-template #emailErrorTpl let-control>
           @if (control.errors?.['email']) {
             The input is not valid E-mail!
@@ -30,13 +30,13 @@
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>Password</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please input your password!">
-        <input nz-input type="password" formControlName="password" (ngModelChange)="validateConfirmPassword()" />
+        <input nz-input type="password" formControlName="password" placeholder="Password" (ngModelChange)="validateConfirmPassword()" />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>Confirm Password</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="passwordErrorTpl">
-        <input nz-input type="password" formControlName="confirm" placeholder="confirm your password" />
+        <input nz-input type="password" formControlName="confirm" placeholder="Confirm your password" />
         <ng-template #passwordErrorTpl let-control>
           @if (control.errors?.['required']) {
             Please confirm your password!
@@ -50,7 +50,7 @@
     <nz-form-item>
       <nz-form-label [nzSpan]="7" nzRequired>Phone Number</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please add your phone number">
-        <input nz-input type="phonenumber" placeholder="phonenumber" formControlName="phonenumber"/>
+        <input nz-input type="phonenumber" placeholder="Phone number" formControlName="phonenumber"/>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
