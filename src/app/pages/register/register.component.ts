@@ -18,6 +18,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { submitRegister } from './registerData';
 import { AuthService } from '../auth.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { UserDataService } from '../../../data/data';
 
 @Component({
   selector: 'app-register',
@@ -82,7 +83,8 @@ export class RegisterComponent {
     private fb: NonNullableFormBuilder,
     private router: Router,
     private authService: AuthService,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private userDataService: UserDataService // Add this line
   ) {
     this.validateForm = this.fb.group({
       name: ['', [Validators.required]],  // Changed from userName to name
@@ -103,13 +105,16 @@ export class RegisterComponent {
 
     submitRegister(email, password, phoneNumber, name, address)  // Updated
       .then((result) => {
-        if(result.status === "success"){
+        if (result.status === "success") {
           this.authService.login();
           this.router.navigate(['main/welcome']);
-          this.message.success('Register succesfully')
-        }
-        else{
-          this.message.error('Register failed')
+          this.message.success('Register successfully');
+          // Trigger a refresh of user data
+          if ('user' in result) {
+            this.userDataService.refreshUserData(result.user);
+          }
+        } else {
+          this.message.error('Register failed');
         }
       })
   }

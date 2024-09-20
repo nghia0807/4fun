@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { getDatabase, ref, onValue, get } from "firebase/database";
+import { getDatabase, ref, get } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
@@ -21,7 +22,7 @@ export interface Appointment {
 
 export interface User {
     name: string;
-    phone: string;
+    phoneNumber: string; // Changed from 'phone' to 'phoneNumber'
     email: string;
     address: string;
 }
@@ -39,6 +40,7 @@ export interface Doctor {
 
 export class UserDataService {
     private currentUser: any = null;
+    private userDataSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
     constructor() {
         onAuthStateChanged(auth, (user) => {
@@ -47,6 +49,7 @@ export class UserDataService {
                 this.fetchUserData(user.uid);
             } else {
                 this.currentUser = null;
+                this.userDataSubject.next(null);
             }
         });
     }
@@ -56,10 +59,19 @@ export class UserDataService {
         get(userRef).then((snapshot) => {
             if (snapshot.exists()) {
                 this.currentUser = { ...this.currentUser, ...snapshot.val() };
+                this.userDataSubject.next(this.currentUser);
             }
         }).catch((error) => {
             console.error("Error fetching user data:", error);
         });
+    }
+
+    getUserData() {
+        return this.userDataSubject.asObservable();
+    }
+
+    refreshUserData(uid: string) {
+        this.fetchUserData(uid)
     }
 
     getName(): string {
