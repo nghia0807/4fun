@@ -35,11 +35,12 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 })
 export class RegisterComponent {
   validateForm: FormGroup<{
-    userName: FormControl<string>;
+    name: FormControl<string>;
     email: FormControl<string>;
     password: FormControl<string>;
     confirm: FormControl<string>;
     phonenumber: FormControl<string>;
+    address: FormControl<string>;  // New field
   }>;
 
   submitForm(): void {
@@ -84,11 +85,12 @@ export class RegisterComponent {
     private message: NzMessageService
   ) {
     this.validateForm = this.fb.group({
-      userName: ['', [Validators.required], [this.userNameAsyncValidator]],
+      name: ['', [Validators.required]],  // Changed from userName to name
       email: ['', [Validators.email, Validators.required]],
       password: ['', [Validators.required]],
       confirm: ['', [this.confirmValidator]],
-      phonenumber: ['', [Validators.required]]
+      phonenumber: ['', [Validators.required]],
+      address: ['', [Validators.required]]  // New field
     });
   }
 
@@ -96,8 +98,10 @@ export class RegisterComponent {
     const email = this.validateForm.value.email ?? '';
     const password = this.validateForm.value.password ?? '';
     const phoneNumber = this.validateForm.value.phonenumber ?? '';
+    const name = this.validateForm.value.name ?? '';  // New
+    const address = this.validateForm.value.address ?? '';  // New
 
-    submitRegister(email, password, phoneNumber)
+    submitRegister(email, password, phoneNumber, name, address)  // Updated
       .then((result) => {
         if(result.status === "success"){
           this.authService.login();
@@ -108,5 +112,5 @@ export class RegisterComponent {
           this.message.error('Register failed')
         }
       })
-    }
+  }
 }

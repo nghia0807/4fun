@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { UserDataService, User } from '../../../data/data';
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -17,11 +18,14 @@ export class HeaderComponent implements OnInit {
     email: '',
     address: ''
   };
-  constructor(
-    private data: UserDataService
-  ) { }
+
+  constructor(private data: UserDataService) { }
 
   ngOnInit(): void {
+    this.updateUserData();
+  }
+
+  private async updateUserData() {
     this.user = {
       name: this.data.getName(),
       phone: this.data.getPhoneNumber(),

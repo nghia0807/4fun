@@ -1,4 +1,12 @@
 import { Injectable } from '@angular/core';
+import { getDatabase, ref, onValue, get } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from './firebaseConfig';
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase();
+const auth = getAuth(app);
 
 export interface Appointment {
     key: string;
@@ -30,24 +38,44 @@ export interface Doctor {
 })
 
 export class UserDataService {
+    private currentUser: any = null;
 
+    constructor() {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.currentUser = user;
+                this.fetchUserData(user.uid);
+            } else {
+                this.currentUser = null;
+            }
+        });
+    }
 
-    constructor() { }
+    private fetchUserData(uid: string) {
+        const userRef = ref(db, `users/${uid}`);
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                this.currentUser = { ...this.currentUser, ...snapshot.val() };
+            }
+        }).catch((error) => {
+            console.error("Error fetching user data:", error);
+        });
+    }
 
     getName(): string {
-        return 'Nguyen Duc Tam';
+        return this.currentUser ? this.currentUser.name : '';
     }
 
     getAddress(): string {
-        return '288/ hoang van thu';
+        return this.currentUser ? this.currentUser.address : '';
     }
 
     getPhoneNumber(): string {
-        return '0123456789';
+        return this.currentUser ? this.currentUser.phoneNumber : '';
     }
 
     getEmail(): string {
-        return "email@gmail.com";
+        return this.currentUser ? this.currentUser.email : '';
     }
 
     getAppointments(): Appointment[] {
@@ -101,3 +129,5 @@ export class System {
 export class DoctorDataService {
 
 }
+
+//lấy thông tin từ firebase, tạo  data structure cho bác sĩ
