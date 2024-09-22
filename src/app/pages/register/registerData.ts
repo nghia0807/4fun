@@ -17,8 +17,8 @@ export const submitRegister = (email: string, password: string, phoneNumber: str
         set(userRef, {
           email: email,
           phoneNumber: phoneNumber,
-          name: name,  // New
-          address: address  // New
+          name: name,
+          address: address
         })
         .then(() => {
           console.log("Data saved successfully");
@@ -41,5 +41,3 @@ export const submitRegister = (email: string, password: string, phoneNumber: str
       }
     })
 }
-
-//thêm họ tên, địa chỉ, bỏ username

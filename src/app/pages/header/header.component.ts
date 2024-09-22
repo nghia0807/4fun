@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
 export class HeaderComponent implements OnInit, OnDestroy {
   user: User = {
     name: '',
-    phoneNumber: '', // Changed to 'phoneNumber'
+    phoneNumber: '',
     email: '',
     address: ''
   };
@@ -29,7 +29,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       if (userData) {
         this.user = {
           name: userData.name || '',
-          phoneNumber: userData.phoneNumber || '', // Changed to 'phoneNumber'
+          phoneNumber: userData.phoneNumber || '',
           email: userData.email || '',
           address: userData.address || ''
         };

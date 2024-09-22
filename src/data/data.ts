@@ -22,7 +22,7 @@ export interface Appointment {
 
 export interface User {
     name: string;
-    phoneNumber: string; // Changed from 'phone' to 'phoneNumber'
+    phoneNumber: string;
     email: string;
     address: string;
 }
@@ -142,4 +142,4 @@ export class DoctorDataService {
 
 }
 
-//lấy thông tin từ firebase, tạo  data structure cho bác sĩ
+//tạo  data structure cho bác sĩ
