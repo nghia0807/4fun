@@ -1,4 +1,13 @@
 import { Injectable } from '@angular/core';
+import { getDatabase, ref, get } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from './firebaseConfig';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase();
+const auth = getAuth(app);
 
 export interface Appointment {
     key: string;
@@ -13,7 +22,7 @@ export interface Appointment {
 
 export interface User {
     name: string;
-    phone: string;
+    phoneNumber: string;
     email: string;
     address: string;
 }
@@ -30,24 +39,55 @@ export interface Doctor {
 })
 
 export class UserDataService {
+    private currentUser: any = null;
+    private userDataSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
+    constructor() {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.currentUser = user;
+                this.fetchUserData(user.uid);
+            } else {
+                this.currentUser = null;
+                this.userDataSubject.next(null);
+            }
+        });
+    }
 
-    constructor() { }
+    private fetchUserData(uid: string) {
+        const userRef = ref(db, `users/${uid}`);
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                this.currentUser = { ...this.currentUser, ...snapshot.val() };
+                this.userDataSubject.next(this.currentUser);
+            }
+        }).catch((error) => {
+            console.error("Error fetching user data:", error);
+        });
+    }
+
+    getUserData() {
+        return this.userDataSubject.asObservable();
+    }
+
+    refreshUserData(uid: string) {
+        this.fetchUserData(uid)
+    }
 
     getName(): string {
-        return 'Nguyen Duc Tam';
+        return this.currentUser ? this.currentUser.name : '';
     }
 
     getAddress(): string {
-        return '288/ hoang van thu';
+        return this.currentUser ? this.currentUser.address : '';
     }
 
     getPhoneNumber(): string {
-        return '0123456789';
+        return this.currentUser ? this.currentUser.phoneNumber : '';
     }
 
     getEmail(): string {
-        return "email@gmail.com";
+        return this.currentUser ? this.currentUser.email : '';
     }
 
     getAppointments(): Appointment[] {
@@ -101,3 +141,5 @@ export class System {
 export class DoctorDataService {
 
 }
+
+//tạo  data structure cho bác sĩ

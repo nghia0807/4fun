@@ -11,6 +11,7 @@ import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../auth.service';
 import { login } from './loginData'
 import { privateDecrypt } from 'crypto';
+import { UserDataService } from '../../../data/data';
 
 @Component({
   selector: 'app-login',
@@ -43,7 +44,8 @@ export class LoginComponent {
     private fb: NonNullableFormBuilder,
     private router: Router,
     private authService: AuthService,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private userDataService: UserDataService // Add this line
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -68,17 +70,17 @@ export class LoginComponent {
   onLogin() {
     const userName = this.validateForm.value.userName ?? '';
     const password = this.validateForm.value.password ?? '';
-    //this.authService.login(userName, password);
     login(userName, password)
-    .then((result) => {
-      if(result.status === "success"){
-        this.authService.login();
-        this.router.navigate(['/main/welcome']);
-        this.message.success('Login successfully')
+      .then((result) => {
+        if (result.status === "success" && 'user' in result) {
+          this.authService.login();
+          this.router.navigate(['/main/welcome']);
+          this.message.success('Login successfully');
+          // Trigger a refresh of user data
+          this.userDataService.refreshUserData(result.user.uid);
+        } else {
+          this.message.error('Login failed');
         }
-        else{
-          this.message.error('Login failed')
-        }
-      })
+      });
   }
 }
