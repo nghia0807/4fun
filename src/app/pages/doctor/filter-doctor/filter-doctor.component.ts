@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { WelcomeFormComponent } from '../../welcome/welcome-form/welcome-form.component';
 
 @Component({
   selector: 'app-filter-doctor',
@@ -25,5 +26,10 @@ export class FilterDoctorComponent {
       tag: this.selectedTag,
     });
     console.log(this.selectedTag);
+  }
+
+  setFilter(value: string) {
+    this.selectedTag = value;
+    this.onFilterChange();
   }
 }

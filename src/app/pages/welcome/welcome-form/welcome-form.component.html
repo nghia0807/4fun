@@ -1,0 +1,51 @@
+<nz-drawer
+  [nzVisible]="isVisible"
+  nzPlacement="bottom"
+  nzTitle="Basic Drawer"
+  [nzBodyStyle]="{ padding: 40 }"
+  nzWrapClassName="user-drawer-custom"
+  [nzHeight]="'calc(100vh - 56px)'"
+  (nzOnClose)="close()"
+  [nzFooter]="footerTpl"
+>
+  <ng-container *nzDrawerContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-control [nzErrorTip]="'Please select your disease type!'">
+          <div style="display: flex; align-items: center;">
+            <span style="margin-right: 8px;">I have related diseases to</span>
+            <nz-select
+              formControlName="selectedType"
+              nzShowSearch
+              nzAllowClear
+              nzPlaceHolder="Select the disease type"
+              style="width: 200px;"
+            >
+              <nz-option nzLabel="dermatology" nzValue="dl"></nz-option>
+              <nz-option nzLabel="gastroenterology" nzValue="th"></nz-option>
+              <nz-option nzLabel="Ear, Nose, and Throat" nzValue="tmh"></nz-option>
+              <nz-option nzLabel="neurology" nzValue="tk"></nz-option>
+              <nz-option nzLabel="cardiology" nzValue="tm"></nz-option>
+            </nz-select>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label>Describe your health condition</nz-form-label>
+        <nz-form-control nzErrorTip="Vui lòng nhập tình trạng bệnh (tối đa 500 ký tự)!">
+          <nz-textarea-count [nzMaxCharacterCount]="500">
+            <textarea rows="4" formControlName="comment" nz-input></textarea>
+          </nz-textarea-count>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+  
+  <ng-template #footerTpl>
+    <div style="float: right">
+      <button nz-button style="margin-right: 8px;" (click)="close()">Cancel</button>
+      <button nz-button nzType="primary" (click)="submit()">Submit</button>
+    </div>
+  </ng-template>
+</nz-drawer>
