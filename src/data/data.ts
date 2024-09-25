@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { getDatabase, ref, get } from "firebase/database";
+import { getDatabase, ref, set, get } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
@@ -74,36 +74,49 @@ export class UserDataService {
         this.fetchUserData(uid)
     }
 
-    getName(): string {
-        return this.currentUser ? this.currentUser.name : '';
-    }
-
-    getAddress(): string {
-        return this.currentUser ? this.currentUser.address : '';
-    }
-
-    getPhoneNumber(): string {
-        return this.currentUser ? this.currentUser.phoneNumber : '';
-    }
-
-    getEmail(): string {
-        return this.currentUser ? this.currentUser.email : '';
-    }
-
     getAppointments(): Appointment[] {
         return [
             { key: '1', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false },
-            { key: '2', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false },
-            { key: '3', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false }
         ];
     }
 
     getHistoryAppointments(): Appointment[] {
         return [
-            { key: '1', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true },
-            { key: '2', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true },
             { key: '3', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true }
         ];
+    }
+
+    createAppointment(uid: string, doctorName: string, time: string, date: Date) {
+        const appointmentId = this.generateAppointmentId(date, time);
+        const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
+        
+        return set(appointmentRef, {
+            doctorName: doctorName,
+            appointmentTime: time,
+            appointmentDate: date.toISOString(),
+            createdAt: new Date().toISOString()
+        })
+        .then(() => {
+            console.log("Appointment created successfully.");
+            return appointmentId; // Return the new appointment ID
+        })
+        .catch((error) => {
+            console.error("Error creating appointment:", error);
+            throw error;
+        });
+    }
+
+    private generateAppointmentId(date: Date, time: string): string {
+        const year = date.getFullYear().toString().slice(-2);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const [hours, minutes] = time.split(':');
+        
+        return `${year}${month}${day}${hours}${minutes}`;
+    }
+
+    public getCurrentUserUid(): string {
+        return this.currentUser.uid;
     }
 }
 
