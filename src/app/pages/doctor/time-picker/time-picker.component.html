@@ -7,8 +7,10 @@
 </div>
 
 <div class="time-picker-container">
-    <div class="time-slot" *ngFor="let time of availableTimes" [class.selected]="time.selected"
-        (click)="onTimeSelect(time)">
+    <div class="time-slot" *ngFor="let time of availableTimes" 
+         [class.selected]="time.selected"
+         [class.disabled]="time.disabled"
+         (click)="onTimeSelect(time)">
         {{ time.time }}
     </div>
 </div>

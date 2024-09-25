@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getDatabase, ref, set, get } from "firebase/database";
+import { getDatabase, ref, set, get, update, remove } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
@@ -12,10 +12,7 @@ const auth = getAuth(app);
 export interface Appointment {
     key: string;
     doctor: string;
-    room: string;
-    day: string;
-    month: string;
-    year: string;
+    date: string;
     time: string;
     meet: boolean;
 }
@@ -74,16 +71,57 @@ export class UserDataService {
         this.fetchUserData(uid)
     }
 
-    getAppointments(): Appointment[] {
-        return [
-            { key: '1', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false },
-        ];
+    async getAppointments(includeHistory: boolean = false): Promise<Appointment[]> {
+        const uid = this.getCurrentUserUid();
+        const appointmentsRef = ref(db, `users/${uid}/appointments`);
+        
+        try {
+            const snapshot = await get(appointmentsRef);
+            if (!snapshot.exists()) return [];
+
+            const now = new Date();
+            return Object.entries(snapshot.val() || {})
+                .filter(([_, appointmentData]: [string, any]) => {
+                    const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
+                    const isPastAppointment = appointmentDateTime < now;
+                    return includeHistory ? isPastAppointment : !isPastAppointment;
+                })
+                .map(([key, appointmentData]: [string, any]) => {
+                    const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
+                    const isPastAppointment = appointmentDateTime < now;
+                    
+                    if (isPastAppointment && !appointmentData.meet) {
+                        this.markAppointmentAsMet(uid, key);
+                    }
+
+                    return {
+                        key,
+                        doctor: appointmentData.doctorName,
+                        date: new Date(appointmentData.appointmentDate).toLocaleDateString(),
+                        time: appointmentData.appointmentTime,
+                        meet: isPastAppointment
+                    };
+                });
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+            return [];
+        }
     }
 
-    getHistoryAppointments(): Appointment[] {
-        return [
-            { key: '3', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true }
-        ];
+    private async markAppointmentAsMet(uid: string, appointmentKey: string): Promise<void> {
+        const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
+        try {
+            await update(appointmentRef, { meet: true });
+        } catch (error) {
+            console.error("Error marking appointment as met:", error);
+        }
+    }
+
+    private combineDateTime(date: string, time: string): Date {
+        const [hours, minutes] = time.split(':').map(Number);
+        const dateTime = new Date(date);
+        dateTime.setHours(hours, minutes, 0, 0);
+        return dateTime;
     }
 
     createAppointment(uid: string, doctorName: string, time: string, date: Date) {
@@ -117,6 +155,19 @@ export class UserDataService {
 
     public getCurrentUserUid(): string {
         return this.currentUser.uid;
+    }
+
+    async cancelAppointment(appointmentKey: string): Promise<void> {
+        const uid = this.getCurrentUserUid();
+        const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
+        
+        try {
+            await remove(appointmentRef);
+            console.log("Appointment cancelled successfully.");
+        } catch (error) {
+            console.error("Error cancelling appointment:", error);
+            throw error;
+        }
     }
 }
 

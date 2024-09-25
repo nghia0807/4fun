@@ -16,7 +16,11 @@ export class HistoryListComponent implements OnInit {
 
   constructor(private userDataService: UserDataService) {}
 
-  ngOnInit() {
-    this.appointments = this.userDataService.getHistoryAppointments();
+  async ngOnInit() {
+    await this.loadHistoryAppointments();
+  }
+
+  async loadHistoryAppointments() {
+    this.appointments = await this.userDataService.getAppointments(true);
   }
 }
