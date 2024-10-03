@@ -14,7 +14,21 @@ export class ListComponent implements OnInit {
 
   constructor(private userDataService: UserDataService) {}
 
-  ngOnInit() {
-    this.appointments = this.userDataService.getAppointments();
+  async ngOnInit() {
+    await this.loadAppointments();
+  }
+
+  async loadAppointments() {
+    this.appointments = await this.userDataService.getAppointments(false);
+  }
+
+  async cancelAppointment(appointmentKey: string) {
+    try {
+      await this.userDataService.cancelAppointment(appointmentKey);
+      await this.loadAppointments();
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      // Handle error (e.g., show an error message to the user)
+    }
   }
 }

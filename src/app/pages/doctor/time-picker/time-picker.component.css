@@ -26,3 +26,8 @@
     background-color: #1890ff;
     color: white;
 }
+
+.time-slot.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

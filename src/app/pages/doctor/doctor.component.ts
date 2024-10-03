@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -9,8 +9,11 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { DoctorModalComponent } from './doctor-modal/doctor-modal.component';
 import { Doctor, System } from '../../../data/data';
 import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
-import { concatMap } from 'rxjs/operators';
+import { concatMap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { FilterDoctorComponent } from './filter-doctor/filter-doctor.component';
+import { UserDataService } from '../../../data/data'; // Import UserDataService
+import { TimePickerComponent } from './time-picker/time-picker.component';
 
 @Component({
   selector: 'app-doctor',
@@ -25,11 +28,12 @@ import { FilterDoctorComponent } from './filter-doctor/filter-doctor.component';
     NzButtonModule,
     DoctorModalComponent,
     NzMessageModule,
-    FilterDoctorComponent
+    FilterDoctorComponent,
+    TimePickerComponent
   ],
   templateUrl: './doctor.component.html',
   styleUrl: './doctor.component.css',
-  providers: [System]
+  providers: [System, UserDataService] // Add UserDataService to providers
 })
 export class DoctorComponent implements OnInit {
   doctors: Doctor[] = [];
@@ -38,11 +42,16 @@ export class DoctorComponent implements OnInit {
   totalDoctors = 0;
   searchTerm: string = '';
   selectedTag: string = '';
+  selectedTime: string = '';
+  selectedDate: Date | null = null;
+
+  @ViewChild(TimePickerComponent) timePickerComponent!: TimePickerComponent;
 
   constructor(
     private modalService: NzModalService,
     private system: System,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private userDataService: UserDataService // Inject UserDataService
   ) { }
 
   ngOnInit() {
@@ -75,12 +84,12 @@ export class DoctorComponent implements OnInit {
   }
 
   showRegistrationModal(doctor: Doctor): void {
-
     const modal: NzModalRef = this.modalService.create({
       nzTitle: `You are registering with Dr.${doctor.name}`,
       nzContent: DoctorModalComponent,
       nzData: {
-        doctor: doctor
+        doctor: doctor,
+        onTimeAndDateSelected: this.onTimeAndDateSelected.bind(this)
       },
       nzFooter: [
         {
@@ -91,19 +100,44 @@ export class DoctorComponent implements OnInit {
           label: 'Đăng ký',
           type: 'primary',
           onClick: () => {
+            if (!this.selectedTime || !this.selectedDate) {
+              this.message.error('Please select a time and date for the appointment');
+              return;
+            }
             this.message
               .loading('Action in progress', { nzDuration: 2500 })
               .onClose!.pipe(
-                concatMap(() => this.message.success('Registering appointment successfully', { nzDuration: 2500 }).onClose!),
-                concatMap(() => this.message.info('Registering is finished', { nzDuration: 2500 }).onClose!)
+                concatMap(() => {
+                  const uid = this.userDataService.getCurrentUserUid();
+                  // Only proceed if selectedDate is not null
+                  if (this.selectedDate) {
+                    return this.userDataService.createAppointment(uid, doctor.name, this.selectedTime, this.selectedDate);
+                  } else {
+                    throw new Error('Selected date is null');
+                  }
+                }),
+                concatMap((appointmentId) => {
+                  console.log('Appointment created with ID:', appointmentId);
+                  return this.message.success('Appointment registered successfully', { nzDuration: 2500 }).onClose!;
+                }),
+                catchError((error) => {
+                  console.error('Error creating appointment:', error);
+                  return this.message.error('Failed to register appointment', { nzDuration: 2500 }).onClose!;
+                })
               )
               .subscribe(() => {
-                console.log('All completed!');
+                console.log('Registration process completed');
               });
             modal.close();
           }
         }
       ]
     });
+  }
+
+  onTimeAndDateSelected(event: { time: string, date: Date }) {
+    this.selectedTime = event.time;
+    this.selectedDate = event.date;
+    console.log('Time and date selected:', this.selectedTime, this.selectedDate);
   }
 }
