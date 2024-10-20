@@ -10,9 +10,8 @@ import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../auth.service';
 import { login } from './loginData'
-import { privateDecrypt } from 'crypto';
 import { UserDataService } from '../../../data/data';
-
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -27,7 +26,8 @@ import { UserDataService } from '../../../data/data';
     NzNotificationModule,
     RouterLink,
     NzMessageComponent,
-    RouterModule
+    RouterModule,
+    NzRadioModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -52,6 +52,10 @@ export class LoginComponent {
       password: ['', [Validators.required]],
       remember: [true]
     });
+  }
+
+  roleSelect(role : string) {
+    return role;
   }
 
   submitForm(): void {

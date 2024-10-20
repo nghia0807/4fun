@@ -1,34 +1,24 @@
 import { Component } from '@angular/core';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzDrawerModule } from 'ng-zorro-antd/drawer';
-import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NzFormModule } from 'ng-zorro-antd/form';
 import { Router } from '@angular/router';
+import { DoctorComponent } from '../../doctor/doctor.component';
+import { DoctorStore } from '../../doctor/doctor.store';
+import { System, UserDataService } from '../../../../data/data';
 import { FilterDoctorComponent } from '../../doctor/filter-doctor/filter-doctor.component';
 @Component({
   selector: 'app-welcome-form',
-  standalone: true,
-  imports: [
-    NzDrawerModule, 
-    NzSelectModule,
-    FormsModule,
-    NzInputModule,
-    NzFormModule,
-    ReactiveFormsModule
-  ],
   templateUrl: './welcome-form.component.html',
-  styleUrl: './welcome-form.component.css'
+  styleUrl: './welcome-form.component.css',
+  providers: [ System, UserDataService, DoctorStore],
 })
 export class WelcomeFormComponent {
   form: FormGroup;
   isVisible = false;
-
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    // private filter: FilterDoctorComponent
+    private store: DoctorStore
   ) {
     this.form = this.fb.group({
       selectedType: ['', Validators.required],
@@ -48,8 +38,9 @@ export class WelcomeFormComponent {
     if (this.form.valid) {
       console.log('Form submitted', this.form.value);
       this.isVisible = false;
+      this.store.setInitialTag(this.form.get('selectedType')?.value);
+      console.log(this.form.get('comment')?.value);
       this.router.navigate(['/main/doctor']);
-      // this.filter.setFilter(this.form.value.selectedType);
     } else {
       Object.values(this.form.controls).forEach(control => {
         if (control.invalid) {
