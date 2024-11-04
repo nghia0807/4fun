@@ -1,19 +1,25 @@
 import { Injectable } from '@angular/core';
+import { getDatabase, ref, set, get, update, remove } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from './firebaseConfig';
+import { BehaviorSubject } from 'rxjs';
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase();
+const auth = getAuth(app);
 
 export interface Appointment {
     key: string;
     doctor: string;
-    room: string;
-    day: string;
-    month: string;
-    year: string;
+    date: string;
     time: string;
     meet: boolean;
 }
 
 export interface User {
     name: string;
-    phone: string;
+    phoneNumber: string;
     email: string;
     address: string;
 }
@@ -30,40 +36,138 @@ export interface Doctor {
 })
 
 export class UserDataService {
+    private currentUser: any = null;
+    private userDataSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
-
-    constructor() { }
-
-    getName(): string {
-        return 'Nguyen Duc Tam';
+    constructor() {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.currentUser = user;
+                this.fetchUserData(user.uid);
+            } else {
+                this.currentUser = null;
+                this.userDataSubject.next(null);
+            }
+        });
     }
 
-    getAddress(): string {
-        return '288/ hoang van thu';
+    private fetchUserData(uid: string) {
+        const userRef = ref(db, `users/${uid}`);
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                this.currentUser = { ...this.currentUser, ...snapshot.val() };
+                this.userDataSubject.next(this.currentUser);
+            }
+        }).catch((error) => {
+            console.error("Error fetching user data:", error);
+        });
     }
 
-    getPhoneNumber(): string {
-        return '0123456789';
+    getUserData() {
+        return this.userDataSubject.asObservable();
     }
 
-    getEmail(): string {
-        return "email@gmail.com";
+    refreshUserData(uid: string) {
+        this.fetchUserData(uid)
     }
 
-    getAppointments(): Appointment[] {
-        return [
-            { key: '1', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false },
-            { key: '2', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false },
-            { key: '3', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: false }
-        ];
+    async getAppointments(includeHistory: boolean = false): Promise<Appointment[]> {
+        const uid = this.getCurrentUserUid();
+        const appointmentsRef = ref(db, `users/${uid}/appointments`);
+        
+        try {
+            const snapshot = await get(appointmentsRef);
+            if (!snapshot.exists()) return [];
+
+            const now = new Date();
+            return Object.entries(snapshot.val() || {})
+                .filter(([_, appointmentData]: [string, any]) => {
+                    const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
+                    const isPastAppointment = appointmentDateTime < now;
+                    return includeHistory ? isPastAppointment : !isPastAppointment;
+                })
+                .map(([key, appointmentData]: [string, any]) => {
+                    const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
+                    const isPastAppointment = appointmentDateTime < now;
+                    
+                    if (isPastAppointment && !appointmentData.meet) {
+                        this.markAppointmentAsMet(uid, key);
+                    }
+
+                    return {
+                        key,
+                        doctor: appointmentData.doctorName,
+                        date: new Date(appointmentData.appointmentDate).toLocaleDateString(),
+                        time: appointmentData.appointmentTime,
+                        meet: isPastAppointment
+                    };
+                });
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+            return [];
+        }
     }
 
-    getHistoryAppointments(): Appointment[] {
-        return [
-            { key: '1', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true },
-            { key: '2', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true },
-            { key: '3', doctor: 'tam', room: 'a123', day: '1', month: '1', year: '1900', time: '0:00:00', meet: true }
-        ];
+    private async markAppointmentAsMet(uid: string, appointmentKey: string): Promise<void> {
+        const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
+        try {
+            await update(appointmentRef, { meet: true });
+        } catch (error) {
+            console.error("Error marking appointment as met:", error);
+        }
+    }
+
+    private combineDateTime(date: string, time: string): Date {
+        const [hours, minutes] = time.split(':').map(Number);
+        const dateTime = new Date(date);
+        dateTime.setHours(hours, minutes, 0, 0);
+        return dateTime;
+    }
+
+    createAppointment(uid: string, doctorName: string, time: string, date: Date) {
+        const appointmentId = this.generateAppointmentId(date, time);
+        const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
+        
+        return set(appointmentRef, {
+            doctorName: doctorName,
+            appointmentTime: time,
+            appointmentDate: date.toISOString(),
+            createdAt: new Date().toISOString()
+        })
+        .then(() => {
+            console.log("Appointment created successfully.");
+            return appointmentId; // Return the new appointment ID
+        })
+        .catch((error) => {
+            console.error("Error creating appointment:", error);
+            throw error;
+        });
+    }
+
+    private generateAppointmentId(date: Date, time: string): string {
+        const year = date.getFullYear().toString().slice(-2);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const [hours, minutes] = time.split(':');
+        
+        return `${year}${month}${day}${hours}${minutes}`;
+    }
+
+    public getCurrentUserUid(): string {
+        return this.currentUser.uid;
+    }
+
+    async cancelAppointment(appointmentKey: string): Promise<void> {
+        const uid = this.getCurrentUserUid();
+        const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
+        
+        try {
+            await remove(appointmentRef);
+            console.log("Appointment cancelled successfully.");
+        } catch (error) {
+            console.error("Error cancelling appointment:", error);
+            throw error;
+        }
     }
 }
 
@@ -72,24 +176,9 @@ export class System {
         return [
             { name: 'trang', specialization: 'Cardiology', tag: 'tm', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
             { name: 'bao', specialization: 'Neurology', tag: 'tk', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'minh', specialization: 'Obstetrics and Gynecology', tag: 'ps', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'quyen', specialization: 'Pediatrics', tag: 'n', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'trung', specialization: 'Pediatrics', tag: 'n', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'lam', specialization: 'Obstetrics and Gynecology', tag: 'spk', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
             { name: 'yen', specialization: 'Gastroenterology', tag: 'th', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
             { name: 'hoang', specialization: 'Dermatology', tag: 'dl', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'khanh', specialization: 'Rheumatology', tag: 'xk', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'phuc', specialization: 'Nutrition', tag: 'dd', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'duy', specialization: 'Dentistry', tag: 'rhm', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'chi', specialization: 'Endocrinology', tag: 'nt', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'hieu', specialization: 'Pulmonology', tag: 'p', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'my', specialization: 'Musculoskeletal', tag: 'cxk', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'tuan', specialization: 'Ophthalmology', tag: 'm', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'thu', specialization: 'Ear, Nose, and Throat', tag: 'tmh', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'luong', specialization: 'Dentistry', tag: 'nk', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'huyen', specialization: 'Oncology', tag: 'ub', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'vui', specialization: 'Nephrology', tag: 't', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' },
-            { name: 'phuong', specialization: 'Hepatobiliary', tag: 'gm', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' }
+            { name: 'thu', specialization: 'Ear, Nose, and Throat', tag: 'tmh', imageUrl: 'https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg' }
         ];
     }
 
@@ -101,3 +190,5 @@ export class System {
 export class DoctorDataService {
 
 }
+
+//tạo  data structure cho bác sĩ

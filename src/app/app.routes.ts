@@ -36,7 +36,7 @@ export const routes: Routes = [
       },
       {
         path: 'welcome',
-        component: WelcomeComponent
+        loadChildren: () => import('./pages/welcome/welcome.module').then((m) => m.WelcomeComponentModule),
       },
       {
         path: 'monitor',

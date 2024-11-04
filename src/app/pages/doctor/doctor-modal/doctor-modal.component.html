@@ -1,4 +1,4 @@
-<p>Hello my name is {{ doctor.name}}</p>
+<p>Hello my name is {{ doctor.name }}</p>
 <p>My specialization was {{ doctor.specialization }}</p>
 <h3>Pick a time that we could make an appointment:</h3>
-<app-time-picker></app-time-picker>
+<app-time-picker (timeAndDateSelected)="onTimeAndDateChange($event)"></app-time-picker>

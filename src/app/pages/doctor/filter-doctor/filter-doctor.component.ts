@@ -1,7 +1,9 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { DoctorStore } from '../doctor.store';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-filter-doctor',
@@ -14,16 +16,31 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
   templateUrl: './filter-doctor.component.html',
   styleUrls: ['./filter-doctor.component.css']
 })
-export class FilterDoctorComponent {
-  @Output() filterChanged = new EventEmitter<{ searchTerm: string, tag: string }>();
+export class FilterDoctorComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   searchTerm: string = '';
-  selectedTag: string = 'all';
+  
+  @Input() selectedTag: string = 'all';
+
+  constructor(private store: DoctorStore) {}
+
+  ngOnInit() {
+    this.onFilterChange();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.store.setInitialTag('all');
+  }
 
   onFilterChange() {
-    this.filterChanged.emit({
-      searchTerm: this.searchTerm,
-      tag: this.selectedTag,
-    });
-    console.log(this.selectedTag);
+    this.store.setFiltersSearch(this.searchTerm);
+    this.store.setFiltersTag(this.selectedTag);
+  }
+
+  setFilter(value: string) {
+    this.selectedTag = value;
+    this.onFilterChange();
   }
 }

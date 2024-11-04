@@ -3,10 +3,7 @@
         <tr>
             <th>Key</th>
             <th>Doctor</th>
-            <th>Room</th>
-            <th>Day</th>
-            <th>Month</th>
-            <th>Year</th>
+            <th>Date</th>
             <th>Time</th>
             <th>Cancel</th>
         </tr>
@@ -16,13 +13,10 @@
         <tr>
             <td>{{ data.key }}</td>
             <td>{{ data.doctor }}</td>
-            <td>{{ data.room }}</td>
-            <td>{{ data.day }}</td>
-            <td>{{ data.month }}</td>
-            <td>{{ data.year }}</td>
+            <td>{{ data.date }}</td>
             <td>{{ data.time }}</td>
             <td>
-                <a> Cancel Appointment </a>
+                <a (click)="cancelAppointment(data.key)">Cancel Appointment</a>
             </td>
         </tr>
         }

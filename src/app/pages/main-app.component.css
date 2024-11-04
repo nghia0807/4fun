@@ -27,7 +27,11 @@
     text-align: center;
     line-height: 32px;
     margin: 0;
-    background: white;
+}
+
+img {
+    width: 20vh;
+    height: 20vh;
 }
 
 .right-layout {
@@ -37,7 +41,6 @@
 }
 
 nz-content {
-    padding: 24px;
     min-height: 81.5vh;
 }
 

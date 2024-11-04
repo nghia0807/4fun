@@ -1,8 +1,8 @@
 <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
     <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>Username</nz-form-label>
+      <nz-form-label [nzSpan]="7" nzRequired>Name</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback nzValidatingTip="Validating..." [nzErrorTip]="userErrorTpl">
-        <input nz-input formControlName="userName" placeholder="async validate try to write JasonWood" />
+        <input nz-input formControlName="name" placeholder="Full Name" />
         <ng-template #userErrorTpl let-control>
           @if (control.errors?.['required']) {
             Please input your username!
@@ -51,6 +51,15 @@
       <nz-form-label [nzSpan]="7" nzRequired>Phone Number</nz-form-label>
       <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please add your phone number">
         <input nz-input type="phonenumber" placeholder="Phone number" formControlName="phonenumber"/>
+<<<<<<< HEAD
+=======
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>Address</nz-form-label>
+      <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please input your address!">
+        <input nz-input formControlName="address" placeholder="Address" />
+>>>>>>> 3dc8ae6a4a03c7e721fb8018f33805a0ff2db0fd
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>

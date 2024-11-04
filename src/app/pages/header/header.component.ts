@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { UserDataService, User } from '../../../data/data';
+import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -10,23 +12,36 @@ import { UserDataService, User } from '../../../data/data';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   user: User = {
     name: '',
-    phone: '',
+    phoneNumber: '',
     email: '',
     address: ''
   };
-  constructor(
-    private data: UserDataService
-  ) { }
+
+  private userSubscription: Subscription | undefined;
+
+  constructor(private data: UserDataService) { }
 
   ngOnInit(): void {
-    this.user = {
-      name: this.data.getName(),
-      phone: this.data.getPhoneNumber(),
-      email: this.data.getEmail(),
-      address: this.data.getAddress()
-    };
+    this.userSubscription = this.data.getUserData().subscribe(userData => {
+      if (userData) {
+        this.user = {
+          name: userData.name || '',
+          phoneNumber: userData.phoneNumber || '',
+          email: userData.email || '',
+          address: userData.address || ''
+        };
+      } else {
+        // Reset user data
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
   }
 }

@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
-
+import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { WelcomeFormComponent } from './welcome-form/welcome-form.component';
 @Component({
   selector: 'app-welcome',
-  standalone: true,
-  imports: [],
   templateUrl: './welcome.component.html',
-  styleUrl: './welcome.component.css'
+  styleUrl: './welcome.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class WelcomeComponent {
+  @ViewChild(WelcomeFormComponent) formComponent!: WelcomeFormComponent;
 
+  onDetail(): void {
+    this.formComponent.open();
+  }
 }
