@@ -11,6 +11,7 @@ export interface DoctorState {
     search_data: string;
     data: Doctor[];
     is_modal: boolean;
+    modal_value: Doctor
     total_doctors: number;
     initial_tag: string;
 }
@@ -22,6 +23,12 @@ const initialState: DoctorState = {
     search_data: '',
     data: [],
     is_modal: false,
+    modal_value: {
+        name: '',
+        specialization: '',
+        tag: '',
+        imageUrl: ''
+    },
     initial_tag: 'all',
 };
 
@@ -31,7 +38,7 @@ const initialState: DoctorState = {
 export class DoctorStore {
     private store: ComponentStore<DoctorState>;
     private initialized = false;
-
+    readonly modal_value$: Observable<Doctor>
     readonly initial_tag$: Observable<string>;
     readonly total_doctors$: Observable<number>;
     readonly data$: Observable<Doctor[]>;
@@ -51,13 +58,17 @@ export class DoctorStore {
         this.filter_search$ = this.store.select(state => state.filter_search);
         this.search_data$ = this.store.select(state => state.search_data);
         this.is_modal$ = this.store.select(state => state.is_modal);
+        this.modal_value$ = this.store.select(state => state.modal_value);
 
         this.filteredDoctors$ = combineLatest([this.data$, this.filter_tag$, this.filter_search$]).pipe(
             map(([doctors, tag, search]) =>
-                doctors.filter(doctor =>
-                    (search === '' || doctor.name.toLowerCase().includes(search.toLowerCase())) &&
-                    (tag === 'all' || doctor.tag === tag)
-                )
+                doctors.filter(doctor => {
+                    const nameMatch = !search || !doctor?.name
+                        ? true
+                        : doctor.name.toLowerCase().includes(search.toLowerCase());
+                    const tagMatch = tag === 'all' || doctor?.tag === tag;
+                    return nameMatch && tagMatch;
+                })
             )
         );
         this.initialize();
@@ -71,7 +82,9 @@ export class DoctorStore {
         }
     }
 
-    
+    setModalValue(value: Doctor) {
+        this.store.patchState({ modal_value: value})
+    }
 
     setTotal(res: number) {
         const total_doctors = res !== 0 ? this.system.getListNumber() : res;

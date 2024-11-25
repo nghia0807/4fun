@@ -1,4 +1,43 @@
-<p>Hello my name is {{ doctor.name }}</p>
-<p>My specialization was {{ doctor.specialization }}</p>
-<h3>Pick a time that we could make an appointment:</h3>
-<app-time-picker (timeAndDateSelected)="onTimeAndDateChange($event)"></app-time-picker>
+<div *ngIf="form_value$ | async as data">
+  <nz-drawer
+    [nzVisible]="(visible$ | async) === true ? true : false"
+    nzTitle="You are registering with {{ data.name }}"
+    (nzOnClose)="onClose()"
+    nzPlacement="bottom"
+    [nzClosable]="false"
+    [nzHeight]="'calc(100vh - 56px)'"
+    [nzFooter]="footerTpl"
+  >
+    <ng-container *nzDrawerContent>
+      <p>
+        {{ "Hi my name is " + data.name }}
+      </p>
+      <p class="text-gray-600">
+        {{ "My specialization was " + data.specialization }}
+      </p>
+
+      <form nz-form [formGroup]="form" nzLayout="vertical" class="space-y-4">
+        <nz-form-item>
+          <nz-form-label>Describe your health condition</nz-form-label>
+          <nz-form-control nzErrorTip="Comment must not exceed 500 characters">
+            <nz-textarea-count [nzMaxCharacterCount]="500">
+              <textarea rows="4" formControlName="comment" nz-input></textarea>
+            </nz-textarea-count>
+          </nz-form-control>
+        </nz-form-item>
+        <h3>Pick a time that you could make an appointment:</h3>
+        <app-time-picker
+          (timeAndDateSelected)="onTimeAndDateSelected($event)"
+        ></app-time-picker>
+      </form>
+    </ng-container>
+    <ng-template #footerTpl>
+      <div style="display: flex; gap: 10px; float: right">
+        <button nz-button (click)="onClose()" style="margin-right: 8px">
+          Cancel
+        </button>
+        <button nz-button nzType="primary" (click)="submitAppointment()" [disabled]="form.invalid">Submit</button>
+      </div>
+    </ng-template>
+  </nz-drawer>
+</div>

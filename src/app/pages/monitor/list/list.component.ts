@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { UserDataService, Appointment } from '../../../../data/data';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [NzTableModule],
+  imports: [NzTableModule, NzPopconfirmModule],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })

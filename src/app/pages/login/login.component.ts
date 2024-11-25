@@ -10,8 +10,9 @@ import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../auth.service';
 import { login } from './loginData'
-import { UserDataService } from '../../../data/data';
+import { System, UserDataService } from '../../../data/data';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { MainStore } from '../main-app.component.store';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -27,17 +28,18 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
     RouterLink,
     NzMessageComponent,
     RouterModule,
-    NzRadioModule
+    NzRadioModule,
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
+  providers: [MainStore, System]
 })
 
 export class LoginComponent {
   validateForm: FormGroup<{
     userName: FormControl<string>;
     password: FormControl<string>;
-    remember: FormControl<boolean>;
+    role: FormControl<string>;
   }>;
 
   constructor(
@@ -45,46 +47,61 @@ export class LoginComponent {
     private router: Router,
     private authService: AuthService,
     private message: NzMessageService,
-    private userDataService: UserDataService // Add this line
+    private userDataService: UserDataService,
+    private mainStore: MainStore
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
       password: ['', [Validators.required]],
-      remember: [true]
+      role: ['', [Validators.required]],
     });
   }
 
-  roleSelect(role : string) {
-    return role;
+  isLogin(): boolean {
+    const userName = this.validateForm.get('userName');
+    const password = this.validateForm.get('password');
+    const role = this.validateForm.get('role');
+
+    return (
+      userName?.valid &&
+      password?.valid &&
+      role?.valid
+    ) ?? false;
   }
 
-  submitForm(): void {
-    if (this.validateForm.valid) {
-      const { userName, password } = this.validateForm.value;
-    } else {
-      Object.values(this.validateForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
-  }
 
   onLogin() {
     const userName = this.validateForm.value.userName ?? '';
     const password = this.validateForm.value.password ?? '';
-    login(userName, password)
-      .then((result) => {
-        if (result.status === "success" && 'user' in result) {
-          this.authService.login();
-          this.router.navigate(['/main/welcome']);
-          this.message.success('Login successfully');
-          // Trigger a refresh of user data
-          this.userDataService.refreshUserData(result.user.uid);
-        } else {
-          this.message.error('Login failed');
-        }
-      });
+    const role = this.validateForm.value.role ?? '';
+    this.mainStore.setRole(role);
+    if (this.isLogin()) {
+      if (role === 'bn') {
+        login(userName, password)
+          .then((result) => {
+            if (result.status === "success" && 'user' in result) {
+              this.authService.login();
+              this.router.navigate(['/main/welcome']);
+              this.message.success('Login successfully');
+              this.userDataService.refreshUserData(result.user.uid);
+            } else {
+              this.message.error('Login failed');
+            }
+          });
+      }
+      else {
+        login(userName, password)
+        .then((result) => {
+          if (result.status === "success" && 'user' in result) {
+            this.authService.login();
+            this.router.navigate(['/main/welcome']);
+            this.message.success('Login successfully');
+            this.userDataService.refreshUserData(result.user.uid);
+          } else {
+            this.message.error('Login failed');
+          }
+        });
+      }
+    }
   }
 }

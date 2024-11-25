@@ -8,6 +8,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    transition: filter 0.3s ease;
+
 }
 
 .welcome-content {

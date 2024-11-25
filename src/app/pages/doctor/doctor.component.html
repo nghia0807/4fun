@@ -27,13 +27,16 @@
           <img alt="{{ doctor.name }}" src="{{ doctor.imageUrl }}" />
         </ng-template>
         <ng-template #actionChoose>
-          <span
-            nz-icon
-            nzType="plus-circle"
-            nzTheme="outline"
+          <button
+            nz-button
+            nzType="text"
             (click)="showRegistrationModal(doctor)"
-            >Register
-          </span>
+            nzBlock
+            [disabled]="blured$ | async"
+          >
+            Register
+            <span nz-icon nzType="plus-circle" nzTheme="outline"> </span>
+          </button>
         </ng-template>
       </div>
     </div>
@@ -49,3 +52,5 @@
     </div>
   </div>
 </div>
+<app-doctor-modal>
+</app-doctor-modal>

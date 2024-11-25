@@ -1,24 +1,30 @@
 <nz-table #basicTable [nzData]="appointments">
-    <thead>
-        <tr>
-            <th>Key</th>
-            <th>Doctor</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Cancel</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (data of basicTable.data; track data) {
-        <tr>
-            <td>{{ data.key }}</td>
-            <td>{{ data.doctor }}</td>
-            <td>{{ data.date }}</td>
-            <td>{{ data.time }}</td>
-            <td>
-                <a (click)="cancelAppointment(data.key)">Cancel Appointment</a>
-            </td>
-        </tr>
-        }
-    </tbody>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Doctor</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Cancel</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (data of basicTable.data; track data) {
+    <tr>
+      <td>{{ data.key }}</td>
+      <td>{{ data.doctor }}</td>
+      <td>{{ data.date }}</td>
+      <td>{{ data.time }}</td>
+      <td>
+        <a
+          nz-popconfirm
+          nzPopconfirmTitle="Are you sure delete this appointment?"
+          nzPopconfirmPlacement="bottom"
+          (nzOnConfirm)="cancelAppointment(data.key)"
+          >Cancel Appointment</a
+        >
+      </td>
+    </tr>
+    }
+  </tbody>
 </nz-table>

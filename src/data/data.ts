@@ -22,6 +22,7 @@ export interface User {
     phoneNumber: string;
     email: string;
     address: string;
+    turn: number;
 }
 
 export interface Doctor {

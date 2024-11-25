@@ -27,8 +27,11 @@ import { NzStepsModule } from 'ng-zorro-antd/steps';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { WelcomeComponent } from './welcome.component';
+import { NzImageModule } from 'ng-zorro-antd/image';
 import { WelcomeFormComponent } from './welcome-form/welcome-form.component';
+import { TimePickerComponent } from '../doctor/time-picker/time-picker.component';
 const NzModules = [
+  NzImageModule,
   NzIconModule,
   NzDividerModule,
   NzButtonModule,
@@ -61,6 +64,7 @@ const NzModules = [
   imports: [
     CommonModule,
     ...NzModules,
+    TimePickerComponent,
     ReactiveFormsModule,
     RouterModule.forChild([
       {
