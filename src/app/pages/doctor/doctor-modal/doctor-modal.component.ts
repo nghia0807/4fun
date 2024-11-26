@@ -84,6 +84,9 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.form.patchValue({
+      name: ''
+    })
     this.destroy$.next();
     this.destroy$.complete();
   }

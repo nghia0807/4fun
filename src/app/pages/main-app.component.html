@@ -77,7 +77,23 @@
           Appointments
         </li>
       </div>
-      <div *ngIf="(role$ | async) === 'bs'"></div>
+      <div *ngIf="(role$ | async) === 'bs'">
+        <li
+          nz-menu-item
+          routerLink="/main/dashboard"
+          routerLinkActive="active"
+        >
+          Welcome
+        </li>
+        <li
+          nz-menu-item
+          routerLink="/main/monitor"
+          [nzSelected]="currentRoute === 'monitor'"
+          routerLinkActive="active"
+        >
+          Appointments
+        </li>
+      </div>
       <li nz-menu-item routerLink="/" (click)="logOut()">Logout</li>
     </ul>
   </nz-sider>
@@ -88,6 +104,6 @@
     <nz-content [class.blurred]="bluredContent$ | async">
       <router-outlet></router-outlet>
     </nz-content>
-    <nz-footer>Footer</nz-footer>
+    <!-- <nz-footer>Footer</nz-footer> -->
   </nz-layout>
 </nz-layout>

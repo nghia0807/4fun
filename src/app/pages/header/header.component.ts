@@ -1,19 +1,25 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { UserDataService, User } from '../../../data/data';
 import { Subscription } from 'rxjs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-
+import { NzButtonComponent } from 'ng-zorro-antd/button';
+import { PurchaseDrawerComponent } from './purchase-drawer/purchase-drawer.component';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, NzDropDownModule, NzIconModule, NzToolTipModule],
+  imports: [CommonModule, NzDropDownModule, NzIconModule, NzToolTipModule,
+    NzButtonComponent,
+    PurchaseDrawerComponent
+  ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  styleUrl: './header.component.css',
+  providers: [PurchaseDrawerComponent]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  @ViewChild(PurchaseDrawerComponent) drawerComponent!: PurchaseDrawerComponent;
   user: User = {
     name: '',
     phoneNumber: '',
@@ -24,7 +30,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private userSubscription: Subscription | undefined;
 
-  constructor(private data: UserDataService) { }
+  constructor(
+    private data: UserDataService,
+    private purchase: PurchaseDrawerComponent
+  ) { }
 
   ngOnInit(): void {
     this.userSubscription = this.data.getUserData().subscribe(userData => {
@@ -46,5 +55,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
     }
+  }
+
+  openDrawer() {
+    this.drawerComponent.open();
   }
 }

@@ -21,6 +21,7 @@
           nzPopconfirmTitle="Are you sure delete this appointment?"
           nzPopconfirmPlacement="bottom"
           (nzOnConfirm)="cancelAppointment(data.key)"
+          [nzPopconfirmVisible]="(blured$ | async) === true ? true : undefined"
           >Cancel Appointment</a
         >
       </td>

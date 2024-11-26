@@ -3,7 +3,7 @@ import { ComponentStore } from "../../component/store.cp";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { combineLatest } from "rxjs";
-import { System } from "../../data/data";
+
 
 export interface PageState {
   role: string;
@@ -30,7 +30,7 @@ export class MainStore {
   readonly bluredSlider$: Observable<boolean>;
   readonly bluredContent$: Observable<boolean>;
 
-  constructor(private system: System) {
+  constructor() {
     this.store = ComponentStore.getInstance<PageState>(initialState);
     this.role$ = this.store.select(s => s.role);
     this.bluredHeader$ = this.store.select(s => s.bluredHeader);
@@ -44,6 +44,11 @@ export class MainStore {
     if (!this.initialized) {
       this.initialized = true;
     }
+  }
+
+  role(): string {
+    const value = this.store.get().role;
+    return value;
   }
 
   setBluredHeader(value: boolean) {

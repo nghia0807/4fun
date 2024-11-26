@@ -27,7 +27,8 @@ export const routes: Routes = [
   {
     path: 'main',
     component: MainAppComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard,],
+    data: { role: 'bn'},
     children: [
       {
         path: '',
@@ -45,6 +46,23 @@ export const routes: Routes = [
       {
         path: 'doctor',
         component: DoctorComponent
+      },
+      {
+        path: '**',
+        component: NopageComponent
+      }
+    ]
+  },
+  {
+    path: 'main',
+    component: MainAppComponent,
+    canActivate: [authGuard,],
+    data: { role: 'bs'},
+    children: [
+      {
+        path: '',
+        redirectTo: '**',
+        pathMatch:'full'
       },
       {
         path: '**',

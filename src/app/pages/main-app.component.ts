@@ -10,6 +10,7 @@ import { MainStore } from './main-app.component.store';
 import { System } from '../../data/data';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { filter } from 'rxjs';
+import { PurchaseDrawerComponent } from './header/purchase-drawer/purchase-drawer.component';
 @Component({
   selector: 'app-main-app',
   standalone: true,
@@ -21,7 +22,7 @@ import { filter } from 'rxjs';
     NzMenuModule,
     RouterLinkActive,
     HeaderComponent,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './main-app.component.html',
   styleUrl: './main-app.component.css',
