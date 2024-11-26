@@ -125,7 +125,7 @@ export class UserDataService {
         return dateTime;
     }
 
-    createAppointment(uid: string, doctorName: string, time: string, date: Date) {
+    createAppointment(uid: string, doctorName: string, time: string, date: Date, healthCondition: string) {
         const appointmentId = this.generateAppointmentId(date, time, doctorName);
         const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
         
@@ -133,6 +133,7 @@ export class UserDataService {
             doctorName: doctorName,
             appointmentTime: time,
             appointmentDate: date.toISOString(),
+            healthCondition: healthCondition,
             createdAt: new Date().toISOString()
         })
         .then(() => {
