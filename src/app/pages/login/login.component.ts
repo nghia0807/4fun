@@ -76,32 +76,32 @@ export class LoginComponent {
     const role = this.validateForm.value.role ?? '';
     this.mainStore.setRole(role);
     if (this.isLogin()) {
-      if (role === 'bn') {
-        login(userName, password)
-          .then((result) => {
-            if (result.status === "success" && 'user' in result) {
-              this.authService.login();
-              this.router.navigate(['/main/welcome']);
-              this.message.success('Login successfully');
-              this.userDataService.refreshUserData(result.user.uid);
-            } else {
-              this.message.error('Login failed');
-            }
-          });
+      if (role === 'bs' && !userName.includes('@doctor')) {
+        this.message.error('Doctor email must contain @doctor');
+        return;
       }
-      else {
-        login(userName, password)
+
+      if (role === 'bn' && userName.includes('@doctor')) {
+        this.message.error('Doctor email cannot be used for patient role');
+        return;
+      }
+
+      login(userName, password)
         .then((result) => {
           if (result.status === "success" && 'user' in result) {
             this.authService.login();
-            this.router.navigate(['/main/welcome']);
             this.message.success('Login successfully');
             this.userDataService.refreshUserData(result.user.uid);
+
+            if (role === 'bs') {
+              this.router.navigate(['/main/welcome']);
+            } else if (role === 'bn') {
+              this.router.navigate(['/main/welcome']);
+            }
           } else {
             this.message.error('Login failed');
           }
         });
-      }
     }
   }
 }

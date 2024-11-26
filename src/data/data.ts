@@ -125,14 +125,15 @@ export class UserDataService {
         return dateTime;
     }
 
-    createAppointment(uid: string, doctorName: string, time: string, date: Date) {
-        const appointmentId = this.generateAppointmentId(date, time);
+    createAppointment(uid: string, doctorName: string, time: string, date: Date, healthCondition: string) {
+        const appointmentId = this.generateAppointmentId(date, time, doctorName);
         const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
         
         return set(appointmentRef, {
             doctorName: doctorName,
             appointmentTime: time,
             appointmentDate: date.toISOString(),
+            healthCondition: healthCondition,
             createdAt: new Date().toISOString()
         })
         .then(() => {
@@ -145,13 +146,14 @@ export class UserDataService {
         });
     }
 
-    private generateAppointmentId(date: Date, time: string): string {
+    private generateAppointmentId(date: Date, time: string, doctorName: string): string {
         const year = date.getFullYear().toString().slice(-2);
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         const [hours, minutes] = time.split(':');
+        const doctorNamePart = doctorName.replace(/\s+/g, '').toUpperCase();
         
-        return `${year}${month}${day}${hours}${minutes}`;
+        return `${doctorNamePart}${year}${month}${day}${hours}${minutes}`;
     }
 
     public getCurrentUserUid(): string {

@@ -121,7 +121,8 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
       const formData = {
         ...this.form.value,
         selectedDate: this.form.get('selectedDate')?.value,
-        selectedTime: this.form.get('selectedTime')?.value
+        selectedTime: this.form.get('selectedTime')?.value,
+        comment: this.form.get('comment')?.value
       };
       console.log(formData, this.doctor);
       this.message
@@ -130,7 +131,7 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
           concatMap(() => {
             const uid = this.userDataService.getCurrentUserUid();
             if (formData.selectedDate) {
-              return this.userDataService.createAppointment(uid, this.doctor, formData.selectedTime, formData.selectedDate);
+              return this.userDataService.createAppointment(uid, this.doctor, formData.selectedTime, formData.selectedDate, formData.comment);
             } else {
               throw new Error('Selected date is null');
             }
