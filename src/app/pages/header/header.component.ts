@@ -4,11 +4,12 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { UserDataService, User } from '../../../data/data';
 import { Subscription } from 'rxjs';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, NzDropDownModule, NzIconModule],
+  imports: [CommonModule, NzDropDownModule, NzIconModule, NzToolTipModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
@@ -17,7 +18,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     name: '',
     phoneNumber: '',
     email: '',
-    address: ''
+    address: '',
+    turn: 0,
   };
 
   private userSubscription: Subscription | undefined;
@@ -31,7 +33,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
           name: userData.name || '',
           phoneNumber: userData.phoneNumber || '',
           email: userData.email || '',
-          address: userData.address || ''
+          address: userData.address || '',
+          turn: userData.turn || 0,
         };
       } else {
         // Reset user data

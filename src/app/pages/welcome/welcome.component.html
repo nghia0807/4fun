@@ -2,7 +2,10 @@
   <div class="welcome-content">
     <h1>Welcome</h1>
     <p>We're glad you're here. Ready to schedule your appointment?</p>
-    <button (click)="onDetail()">Make appointment now</button>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button [disabled]="blured" (click)="onBlur(true)">Introduction</button>
+      <button [disabled]="blured" (click)="onDetail()">Book doctor</button>
+    </div>
   </div>
   <app-welcome-form></app-welcome-form>
 </div>

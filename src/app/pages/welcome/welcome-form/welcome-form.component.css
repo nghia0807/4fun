@@ -5,3 +5,41 @@ nz-select {
 nz-select {
     margin: 10px;
 }
+
+.step1 {
+    background-image: url('../img1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    /* display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; */
+}
+
+.small-card {
+
+    /* Giảm padding của card */
+    ::ng-deep .ant-card-body {
+        padding: 12px;
+    }
+
+    /* Giảm kích thước chữ tiêu đề */
+    ::ng-deep .ant-card-meta-title {
+        font-size: 14px;
+        margin-bottom: 4px !important;
+    }
+
+    /* Giảm kích thước chữ mô tả */
+    ::ng-deep .ant-card-meta-description {
+        font-size: 12px;
+    }
+
+    /* Giảm padding phần actions */
+    ::ng-deep .ant-card-actions {
+        li {
+            margin: 4px 0;
+        }
+    }
+}

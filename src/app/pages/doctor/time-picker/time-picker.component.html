@@ -1,16 +1,28 @@
-<div class="date-picker-container">
-    <nz-date-picker (ngModelChange)="onDateChange($event)" [nzFormat]="'dd/MM/yyyy'" ngModel></nz-date-picker>
-</div>
+<form [formGroup]="form">
+  <div class="date-picker-container">
+    <nz-date-picker
+      formControlName="date"
+      (ngModelChange)="onDateChange($event)"
+      [nzDisabledDate]="disableDateFn"
+      [nzFormat]="'dd/MM/yyyy'"
+    >
+    </nz-date-picker>
+  </div>
 
-<div *ngIf="selectedDate" class="selected-date">
-    <p>Selected date: {{ selectedDate | date: 'fullDate' }}</p>
-</div>
+  <div *ngIf="form.get('date')?.value" class="selected-date">
+    <p>Selected date: {{ form.get("date")?.value | date : "fullDate" }}</p>
+  </div>
 
-<div class="time-picker-container">
-    <div class="time-slot" *ngFor="let time of availableTimes" 
-         [class.selected]="time.selected"
-         [class.disabled]="time.disabled"
-         (click)="onTimeSelect(time)">
-        {{ time.time }}
-    </div>
-</div>
+  <div class="time-picker-container">
+    <button
+      nz-button
+      nzType="default"
+      *ngFor="let time of availableTimes; let i = index"
+      [class.selected]="time.selected"
+      [class.disabled]="time.disabled"
+      (click)="onTimeSelect(time, i)"
+    >
+      {{ time.time }}
+    </button>
+  </div>
+</form>
