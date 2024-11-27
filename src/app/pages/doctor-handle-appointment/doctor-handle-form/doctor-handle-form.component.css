@@ -1,0 +1,17 @@
+.cancel-reasons-column .reason-item {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.cancel-reasons-column .reason-item label {
+    display: flex;
+    align-items: center;
+}
+
+.cancel-reasons-column .reason-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.cancel-reasons-column .other-reason {
+    margin-top: 15px;
+}

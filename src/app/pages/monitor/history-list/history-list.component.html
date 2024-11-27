@@ -1,20 +1,29 @@
 <nz-table #basicTable [nzData]="appointments">
-    <thead>
-        <tr>
-            <th>Key</th>
-            <th>Doctor</th>
-            <th>Date</th>
-            <th>Time</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (data of basicTable.data; track data) {
-        <tr>
-            <td>{{ data.key }}</td>
-            <td>{{ data.doctor }}</td>
-            <td>{{ data.date }}</td>
-            <td>{{ data.time }}</td>
-        </tr>
-        }
-    </tbody>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Doctor</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (data of basicTable.data; track data) {
+    <tr>
+      <td>{{ data.key }}</td>
+      <td>{{ data.doctor }}</td>
+      <td>{{ data.date }}</td>
+      <td>{{ data.time }}</td>
+      <td>
+        <nz-tag
+          *ngIf="getStatusConfig(data.status)"
+          [nzColor]="getStatusConfig(data.status)?.color"
+        >
+          {{ getStatusConfig(data.status)?.label }}
+        </nz-tag>
+      </td>
+    </tr>
+    }
+  </tbody>
 </nz-table>

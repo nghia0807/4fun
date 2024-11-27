@@ -85,18 +85,19 @@ export class LoginComponent {
         this.message.error('Doctor email cannot be used for patient role');
         return;
       }
-
       login(userName, password)
         .then((result) => {
           if (result.status === "success" && 'user' in result) {
             this.authService.login();
             this.message.success('Login successfully');
             this.userDataService.refreshUserData(result.user.uid);
-
+            
             if (role === 'bs') {
-              this.router.navigate(['/main/welcome']);
+              this.mainStore.setRole('bs');
+              this.router.navigate(['/main-bs/welcome']);
             } else if (role === 'bn') {
-              this.router.navigate(['/main/welcome']);
+              this.mainStore.setRole('bn');
+              this.router.navigate(['/main-bn/welcome']);
             }
           } else {
             this.message.error('Login failed');

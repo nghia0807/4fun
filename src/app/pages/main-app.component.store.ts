@@ -36,7 +36,7 @@ export class MainStore {
     this.bluredHeader$ = this.store.select(s => s.bluredHeader);
     this.bluredContent$ = this.store.select(s => s.bluredContent);
     this.bluredSlider$ = this.store.select(s => s.bluredSlider);
-
+    this.role = this.role.bind(this);
     this.initialize();
   }
 
@@ -46,7 +46,7 @@ export class MainStore {
     }
   }
 
-  role(): string {
+  role = (): string => {
     const value = this.store.get().role;
     return value;
   }

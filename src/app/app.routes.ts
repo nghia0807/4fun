@@ -9,6 +9,7 @@ import { MonitorComponent } from './pages/monitor/monitor.component';
 import { NopageComponent } from './pages/nopage/nopage.component';
 import { DoctorComponent } from './pages/doctor/doctor.component';
 import { authGuard } from './pages/auth.guard';
+import { DoctorWelcomeComponent } from './pages/doctor-welcome/doctor-welcome.component';
 
 export const routes: Routes = [
   {
@@ -25,7 +26,7 @@ export const routes: Routes = [
     component: RegisterComponent
   },
   {
-    path: 'main',
+    path: 'main-bn',
     component: MainAppComponent,
     canActivate: [authGuard,],
     data: { role: 'bn'},
@@ -54,19 +55,23 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'main',
+    path: 'main-bs',
     component: MainAppComponent,
     canActivate: [authGuard,],
     data: { role: 'bs'},
     children: [
       {
         path: '',
-        redirectTo: '**',
+        redirectTo: 'welcome',
         pathMatch:'full'
       },
       {
-        path: '**',
-        component: NopageComponent
+        path: 'welcome',
+        loadChildren: () => import('./pages/doctor-welcome/doctor-welcome.module').then((m) => m.DoctorWelcomeModule)
+      },
+      {
+        path: 'appointment',
+        loadChildren: () => import('./pages/doctor-handle-appointment/doctor-handle.module').then((m) => m.DoctorHandleAppointmentModule)
       }
     ]
   }

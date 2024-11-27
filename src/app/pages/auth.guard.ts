@@ -8,15 +8,21 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const mainStore = inject(MainStore);
 
-  if (authService.isLoggedIn()) {
-    return true;
+  console.log('IsLoggedIn:', authService.isLoggedIn());
+  console.log('Required Role:', route.data['role']);
+  console.log('Current User Role:', mainStore.role());
+
+  if (!authService.isLoggedIn()) {
+    router.navigate(['/login']);
+    return false;
   }
 
-  const requiredRole = route.data['role']; // Add role requirement in route configuration
+  const requiredRole = route.data['role'];
   const userRole = mainStore.role();
-  console.log(userRole);
+
   if (requiredRole && userRole !== requiredRole) {
-    router.navigate(['/unauthorized']); // Redirect to unauthorized page
+    console.log('Role mismatch, redirecting to login');
+    router.navigate(['/login']); 
     return false;
   }
 

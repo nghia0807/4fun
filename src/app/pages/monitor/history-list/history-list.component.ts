@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { UserDataService, Appointment } from '../../../../data/data';
-
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { AppointmentStatus, ListOfAppointmentStatus } from '../../../../component/enum';
 @Component({
   selector: 'app-history-list',
   standalone: true,
   imports: [
-    NzTableModule
+    CommonModule,
+    NzTableModule,
+    NzTagModule
   ],
   templateUrl: './history-list.component.html',
   styleUrl: './history-list.component.css'
@@ -22,5 +26,9 @@ export class HistoryListComponent implements OnInit {
 
   async loadHistoryAppointments() {
     this.appointments = await this.userDataService.getAppointments(true);
+  }
+
+  getStatusConfig(status: AppointmentStatus) {
+    return ListOfAppointmentStatus.find(item => item.value === status);
   }
 }

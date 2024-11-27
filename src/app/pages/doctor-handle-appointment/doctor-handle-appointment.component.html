@@ -1,0 +1,55 @@
+<div style="margin: 15px">
+  <div class="table-title-container mb-4">
+    <h2 class="text-xl font-semibold">Appointment List</h2>
+  </div>
+
+  <nz-table
+    #basicTable
+    [nzData]="appointments"
+    [nzPageSize]="5"
+    [nzShowPagination]="false"
+  >
+    <thead>
+      <tr>
+          <!-- <th>Key</th> -->
+          <th>Patient Name</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (data of basicTable.data; track data) {
+      <tr>
+        
+        <!-- <td>{{ data.id }}</td> -->
+        <td>{{ data.patientName }}</td>
+        <td>{{ data.time }}</td>
+        <td>{{ data.status }}</td>
+        <td style="width: 150px;">
+          <nz-tag
+            *ngIf="getStatusConfig(data.status)"
+            [nzColor]="getStatusConfig(data.status)?.color"
+          >
+            {{ getStatusConfig(data.status)?.label }}
+          </nz-tag>
+        </td>
+        <td style="width: 300px;">
+            <a nz-button nzType="text" (click)="openMeeting()" >In Meeting</a>
+            <a nz-button nzType="text" nzDanger>Cancle appointment</a>
+        </td>
+        } @for (emptyRow of getEmptyRows(5 - basicTable.data.length); track
+        emptyRow) {
+      <tr class="empty-row">
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      }
+    </tbody>
+  </nz-table>
+</div>
+<app-doctor-handle-form></app-doctor-handle-form>

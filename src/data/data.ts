@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
 import { BehaviorSubject } from 'rxjs';
+import { AppointmentStatus } from '../component/enum';
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
@@ -14,7 +15,7 @@ export interface Appointment {
     doctor: string;
     date: string;
     time: string;
-    meet: boolean;
+    status: AppointmentStatus
 }
 
 export interface User {
@@ -30,6 +31,24 @@ export interface Doctor {
     specialization: string;
     tag: string;
     imageUrl: string;
+}
+//use for the table
+export interface UserAppointment {
+    id: number;
+    patientName: string;
+    comment: string;
+    status: AppointmentStatus;
+    appointmentDate: Date;
+}
+
+//use for the drawer
+export interface Appointmentvalue {
+    id: number;
+    patientName: string;
+    birth: Date;
+    address: string;
+    comment: string;
+    appointmentDate: Date;
 }
 
 @Injectable({
@@ -75,7 +94,7 @@ export class UserDataService {
     async getAppointments(includeHistory: boolean = false): Promise<Appointment[]> {
         const uid = this.getCurrentUserUid();
         const appointmentsRef = ref(db, `users/${uid}/appointments`);
-        
+
         try {
             const snapshot = await get(appointmentsRef);
             if (!snapshot.exists()) return [];
@@ -90,7 +109,7 @@ export class UserDataService {
                 .map(([key, appointmentData]: [string, any]) => {
                     const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
                     const isPastAppointment = appointmentDateTime < now;
-                    
+
                     if (isPastAppointment && !appointmentData.meet) {
                         this.markAppointmentAsMet(uid, key);
                     }
@@ -100,7 +119,8 @@ export class UserDataService {
                         doctor: appointmentData.doctorName,
                         date: new Date(appointmentData.appointmentDate).toLocaleDateString(),
                         time: appointmentData.appointmentTime,
-                        meet: isPastAppointment
+                        meet: isPastAppointment,
+                        status: AppointmentStatus.MEETING
                     };
                 });
         } catch (error) {
@@ -128,7 +148,7 @@ export class UserDataService {
     createAppointment(uid: string, doctorName: string, time: string, date: Date, healthCondition: string) {
         const appointmentId = this.generateAppointmentId(date, time, doctorName);
         const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
-        
+
         return set(appointmentRef, {
             doctorName: doctorName,
             appointmentTime: time,
@@ -136,14 +156,14 @@ export class UserDataService {
             healthCondition: healthCondition,
             createdAt: new Date().toISOString()
         })
-        .then(() => {
-            console.log("Appointment created successfully.");
-            return appointmentId; // Return the new appointment ID
-        })
-        .catch((error) => {
-            console.error("Error creating appointment:", error);
-            throw error;
-        });
+            .then(() => {
+                console.log("Appointment created successfully.");
+                return appointmentId; // Return the new appointment ID
+            })
+            .catch((error) => {
+                console.error("Error creating appointment:", error);
+                throw error;
+            });
     }
 
     private generateAppointmentId(date: Date, time: string, doctorName: string): string {
@@ -152,7 +172,7 @@ export class UserDataService {
         const day = date.getDate().toString().padStart(2, '0');
         const [hours, minutes] = time.split(':');
         const doctorNamePart = doctorName.replace(/\s+/g, '').toUpperCase();
-        
+
         return `${doctorNamePart}${year}${month}${day}${hours}${minutes}`;
     }
 
@@ -163,7 +183,7 @@ export class UserDataService {
     async cancelAppointment(appointmentKey: string): Promise<void> {
         const uid = this.getCurrentUserUid();
         const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
-        
+
         try {
             await remove(appointmentRef);
             console.log("Appointment cancelled successfully.");

@@ -4,11 +4,13 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { UserDataService, Appointment } from '../../../../data/data';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { MainStore } from '../../main-app.component.store';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { AppointmentStatus, ListOfAppointmentStatus } from '../../../../component/enum';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [NzTableModule, NzPopconfirmModule, CommonModule],
+  imports: [NzTableModule, NzPopconfirmModule, CommonModule, NzTagModule],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css'],
   providers: [MainStore]
@@ -27,6 +29,10 @@ export class ListComponent implements OnInit {
 
   async loadAppointments() {
     this.appointments = await this.userDataService.getAppointments(false);
+  }
+
+  getStatusConfig(status: AppointmentStatus) {
+    return ListOfAppointmentStatus.find(item => item.value === status);
   }
 
   async cancelAppointment(appointmentKey: string) {

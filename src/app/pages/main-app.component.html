@@ -1,42 +1,52 @@
 <div class="guide-header" *ngIf="headerGuide">
   <h2>This is a header</h2>
   <p>It's showing us own information and own turn to book a doctor.</p>
-  <div style="display: flex; gap: 10px; float: right;">
-    <button nz-button nzType="default" (click)="closeGuide()">Skip guide</button>
+  <div style="display: flex; gap: 10px; float: right">
+    <button nz-button nzType="default" (click)="closeGuide()">
+      Skip guide
+    </button>
     <button nz-button nzType="primary" (click)="nextHeader()">Next</button>
   </div>
 </div>
-<div class="guide-header" style="left: 26%;" *ngIf="sliderGuider">
+<div class="guide-header" style="left: 26%" *ngIf="sliderGuider">
   <h2>This is a sider</h2>
   <p>It's showing us which page are in used.</p>
-  <div style="display: flex; gap: 10px; float: right;">
-    <button nz-button nzType="default" (click)="closeGuide()">Skip guide</button>
+  <div style="display: flex; gap: 10px; float: right">
+    <button nz-button nzType="default" (click)="closeGuide()">
+      Skip guide
+    </button>
     <button nz-button nzType="default" (click)="backHeader()">Back</button>
     <button nz-button nzType="primary" (click)="nextWelcome()">Next</button>
   </div>
 </div>
-<div class="guide-header" style="top: 58%;" *ngIf="welcomeGuider">
+<div class="guide-header" style="top: 58%" *ngIf="welcomeGuider">
   <h2>This is a welcome page</h2>
   <p>It's showing us how to use web and how to book a doctor.</p>
-  <div style="display: flex; gap: 10px; float: right;">
-    <button nz-button nzType="default" (click)="closeGuide()">Skip guide</button>
+  <div style="display: flex; gap: 10px; float: right">
+    <button nz-button nzType="default" (click)="closeGuide()">
+      Skip guide
+    </button>
     <button nz-button nzType="default" (click)="backSlider()">Back</button>
     <button nz-button nzType="primary" (click)="nextDoctor()">Next</button>
   </div>
 </div>
-<div class="guide-header" style="top: 58%;" *ngIf="doctorGuider">
+<div class="guide-header" style="top: 58%" *ngIf="doctorGuider">
   <h2>This is a doctor page</h2>
   <p>It shows us which doctors can choose and choose individual doctors.</p>
-  <div style="display: flex; gap: 10px; float: right;">
-    <button nz-button nzType="default" (click)="closeGuide()">Skip guide</button>
+  <div style="display: flex; gap: 10px; float: right">
+    <button nz-button nzType="default" (click)="closeGuide()">
+      Skip guide
+    </button>
     <button nz-button nzType="default" (click)="backWelcome()">Back</button>
     <button nz-button nzType="primary" (click)="nextAppointment()">Next</button>
   </div>
 </div>
-<div class="guide-header" style="top: 58%;" *ngIf="appointmentGuider">
+<div class="guide-header" style="top: 58%" *ngIf="appointmentGuider">
   <h2>This is a appointment page</h2>
-  <p>It shows us own history appointment and appointment that we just registered.</p>
-  <div style="display: flex; gap: 10px; float: right;">
+  <p>
+    It shows us own history appointment and appointment that we just registered.
+  </p>
+  <div style="display: flex; gap: 10px; float: right">
     <button nz-button nzType="default" (click)="backDoctor()">Back</button>
     <button nz-button nzType="primary" (click)="closeGuide()">Complete</button>
   </div>
@@ -55,14 +65,14 @@
         <li
           nz-menu-item
           [nzSelected]="currentRoute === 'welcome'"
-          routerLink="/main/welcome"
+          routerLink="/main-bn/welcome"
           routerLinkActive="active"
         >
           Welcome
         </li>
         <li
           nz-menu-item
-          routerLink="/main/doctor"
+          routerLink="/main-bn/doctor"
           [nzSelected]="currentRoute === 'doctor'"
           routerLinkActive="active"
         >
@@ -70,7 +80,7 @@
         </li>
         <li
           nz-menu-item
-          routerLink="/main/monitor"
+          routerLink="/main-bn/monitor"
           [nzSelected]="currentRoute === 'monitor'"
           routerLinkActive="active"
         >
@@ -80,19 +90,27 @@
       <div *ngIf="(role$ | async) === 'bs'">
         <li
           nz-menu-item
-          routerLink="/main/dashboard"
+          [nzSelected]="currentRoute === 'welcome'"
+          routerLink="/main-bs/welcome"
           routerLinkActive="active"
         >
           Welcome
         </li>
         <li
           nz-menu-item
-          routerLink="/main/monitor"
-          [nzSelected]="currentRoute === 'monitor'"
+          [nzSelected]="currentRoute === 'appointment'"
+          routerLink="/main-bs/appointment"
           routerLinkActive="active"
         >
           Appointments
         </li>
+        <!-- <li
+          nz-menu-item
+          routerLink="/main-bs/appointment"
+          routerLinkActive="active"
+        >
+          Appointments
+        </li> -->
       </div>
       <li nz-menu-item routerLink="/" (click)="logOut()">Logout</li>
     </ul>

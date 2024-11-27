@@ -70,7 +70,7 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
     this.valueSubscription = this.form_value$
       .pipe(takeUntil(this.destroy$))
       .subscribe((x) => {
-        if(x.name){
+        if (x && x.name) {
           this.doctor = x.name;
         }
         else {
