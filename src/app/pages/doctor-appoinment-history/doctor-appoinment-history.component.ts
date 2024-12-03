@@ -128,7 +128,6 @@ export class DoctorAppoinmentHistoryComponent {
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     //xử lí lọc theo selectedMonth
-    console.log(this.selectedMonth);
     return this.appointments.slice(startIndex, endIndex);
   }
 
