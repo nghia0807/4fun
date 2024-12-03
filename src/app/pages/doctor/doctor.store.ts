@@ -24,6 +24,7 @@ const initialState: DoctorState = {
   data: [],
   is_modal: false,
   modal_value: {
+    id: '',
     name: '',
     specialization: '',
     tag: '',

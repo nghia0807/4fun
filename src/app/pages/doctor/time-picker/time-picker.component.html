@@ -20,6 +20,7 @@
       *ngFor="let time of availableTimes; let i = index"
       [class.selected]="time.selected"
       [class.disabled]="time.disabled"
+      [disabled]="time.disabled"
       (click)="onTimeSelect(time, i)"
     >
       {{ time.time }}

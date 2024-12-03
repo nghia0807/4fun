@@ -1,5 +1,5 @@
 <div class="header">
-  <div style="color: white">
+  <div style="color: white" *ngIf="(role$ | async) === 'bn'" >
     <span
       nz-tooltip
       nzTooltipTitle="This is a number of turn that you can book a doctor."

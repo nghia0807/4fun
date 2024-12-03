@@ -4,11 +4,14 @@ import { Router } from '@angular/router';
 import { DoctorStore } from '../../doctor/doctor.store';
 import { System, UserDataService } from '../../../../data/data';
 import { TimePickerComponent } from '../../doctor/time-picker/time-picker.component';
-
+import { Doctor } from '../../../../data/data';
+import { EmailVerificationService } from '../../../../component/email';
+import { NzMessageService } from 'ng-zorro-antd/message';
 interface TimeAndDateSelection {
   time: string;
   date: Date;
 }
+
 
 @Component({
   selector: 'app-welcome-form',
@@ -22,25 +25,31 @@ export class WelcomeFormComponent implements OnInit {
   readonly filteredDoctors$ = this.store.filteredDoctors$;
   steps = 0;
   isVisible = false;
+  selectedDoctor: string | null = null;
+  selectedDoctorFullName: string | null = null;
   @ViewChild(TimePickerComponent)
   timePickerComponent!: TimePickerComponent;
   form = new UntypedFormGroup({
     selectedType: new UntypedFormControl(null, [Validators.required]),
     comment: new UntypedFormControl(null, [Validators.required, Validators.maxLength(500)]),
     selectedDate: new UntypedFormControl(null, [Validators.required]),
-    selectedTime: new UntypedFormControl(null, [Validators.required]) // Added time control
+    selectedTime: new UntypedFormControl(null, [Validators.required]),
+    selectedDoctorFullName: new UntypedFormControl(null)
   });
+
   ngOnInit(): void {
     this.resetForm();
     this.store.setData();
     localStorage.removeItem('selectedDate');
     localStorage.removeItem('selectedTime');
   }
+
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
     private store: DoctorStore,
-    private timePicker: TimePickerComponent
+    private timePicker: TimePickerComponent,
+    private userDataService: UserDataService,
+    private emailVerificationService: EmailVerificationService,
+    private message: NzMessageService
   ) {
   }
 
@@ -50,8 +59,11 @@ export class WelcomeFormComponent implements OnInit {
       selectedType: null,
       comment: null,
       selectedDate: null,
-      selectedTime: null
+      selectedTime: null,
+      selectedDoctorFullName: null
     });
+    this.selectedDoctor = null;
+    this.selectedDoctorFullName = null;
     if (this.timePickerComponent) {
       this.timePickerComponent.availableTimes.forEach(time => {
         time.selected = false;
@@ -62,19 +74,36 @@ export class WelcomeFormComponent implements OnInit {
   }
 
   // Handle time and date selection from TimePickerComponent
-  onTimeAndDateChange(selection: TimeAndDateSelection | null): void {
+  onTimeAndDateChange(selection: { time: string, date: Date } | null): void {
+    console.log('Selection received:', selection);
+    
     if (selection) {
-      this.form.patchValue({
-        selectedDate: selection.date,
-        selectedTime: selection.time
+      console.log('Date:', selection.date);
+      console.log('Time:', selection.time);
+      
+      this.form.patchValue({ 
+        selectedDate: selection.date, 
+        selectedTime: selection.time 
       });
     } else {
-      // Clear the selections when null is received
-      this.form.patchValue({
-        selectedDate: '',
-        selectedTime: ''
+      console.log('Selection is null');
+      this.form.patchValue({ 
+        selectedDate: null, 
+        selectedTime: null 
       });
     }
+  }
+
+  // New method to select a doctor
+  selectDoctor(doctor: Doctor): void {
+    // If the same doctor is clicked again, unselect
+    this.selectedDoctor = this.selectedDoctor === doctor.id ? null : doctor.id;
+    this.selectedDoctorFullName = this.selectedDoctor ? doctor.name : null;
+
+    // Update the form with the selected doctor's full name
+    this.form.patchValue({
+      selectedDoctorFullName: this.selectedDoctorFullName
+    });
   }
 
   onback(): void {
@@ -125,7 +154,6 @@ export class WelcomeFormComponent implements OnInit {
 
   open(): void {
     this.isVisible = true;
-    // this.store.setFiltersSearch('');
   }
 
   close(): void {
@@ -135,23 +163,51 @@ export class WelcomeFormComponent implements OnInit {
     this.timePicker.clearSelections();
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.form.valid) {
       const formData = {
         ...this.form.value,
-        // dateTime: this.combineDateAndTime(
-        //   this.form.value.selectedDate,
-        //   this.form.value.selectedTime
-        // )
+        selectedDoctorFullName: this.selectedDoctorFullName
       };
 
-      console.log('Form submitted', formData);
-      this.store.setInitialTag(this.form.get('selectedType')?.value);
-      this.isVisible = false;
-      this.steps = 0;
-      this.resetForm();
-      this.timePicker.clearSelections();
-      // this.router.navigate(['/main/doctor']);
+      try {
+        // Assuming you have access to the current user's UID and email
+        const userName = this.userDataService.getCurrentUserName(); // Replace with actual user name retrieval
+        const uid = this.userDataService.getCurrentUserUid();
+        const userEmail = this.userDataService.getCurrentUserEmail();
+
+        // Create the appointment
+        const appointmentId = await this.userDataService.createAppointment(
+          uid,
+          this.selectedDoctor!,
+          this.selectedDoctorFullName!,
+          formData.selectedTime,
+          formData.selectedDate,
+          formData.comment
+        );
+
+        // Send appointment confirmation email
+        const emailSent = await this.emailVerificationService.sendAppointmentEmail(
+          userEmail,
+          userName,
+          appointmentId,
+          formData.selectedDate.toLocaleDateString(),
+          formData.selectedTime,
+          this.selectedDoctorFullName!
+        );
+
+        if (emailSent) {
+          this.message.success('Appointment registered successfully');
+          this.isVisible = false;
+          this.steps = 0;
+          this.resetForm();
+          this.timePicker.clearSelections();
+        } else {
+          this.message.error('Failed to register appointment');
+          // You might want to handle this case differently
+        }
+      } catch (error) {
+      }
     } else {
       this.markAllControlsAsDirty();
     }
@@ -162,15 +218,5 @@ export class WelcomeFormComponent implements OnInit {
       control.markAsTouched();
       control.updateValueAndValidity({ onlySelf: true });
     });
-  }
-
-  private combineDateAndTime(date: Date, timeString: string): Date {
-    if (!date || !timeString) return new Date();
-
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const combinedDate = new Date(date);
-    combinedDate.setHours(hours, minutes, 0, 0);
-
-    return combinedDate;
   }
 }

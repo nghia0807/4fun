@@ -1,72 +1,130 @@
-<form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
-    <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>Name</nz-form-label>
-      <nz-form-control [nzSpan]="12" nzHasFeedback nzValidatingTip="Validating..." [nzErrorTip]="userErrorTpl">
-        <input nz-input formControlName="name" placeholder="Full Name" />
-        <ng-template #userErrorTpl let-control>
-          @if (control.errors?.['required']) {
-            Please input your username!
-          }
-          @if (control.errors?.['duplicated']) {
-            The username is redundant!
-          }
-        </ng-template>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>E-mail</nz-form-label>
-      <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="emailErrorTpl">
-        <input nz-input formControlName="email" placeholder="E-mail" type="email" />
-        <ng-template #emailErrorTpl let-control>
-          @if (control.errors?.['email']) {
-            The input is not valid E-mail!
-          }
-          @if (control.errors?.['required']) {
-            Please input your E-mail!
-          }
-        </ng-template>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>Password</nz-form-label>
-      <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please input your password!">
-        <input nz-input type="password" formControlName="password" placeholder="Password" (ngModelChange)="validateConfirmPassword()" />
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>Confirm Password</nz-form-label>
-      <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="passwordErrorTpl">
-        <input nz-input type="password" formControlName="confirm" placeholder="Confirm your password" />
-        <ng-template #passwordErrorTpl let-control>
-          @if (control.errors?.['required']) {
-            Please confirm your password!
-          }
-          @if (control.errors?.['confirm']) {
-            Password is inconsistent!
-          }
-        </ng-template>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>Phone Number</nz-form-label>
-      <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please add your phone number">
-        <input nz-input type="phonenumber" placeholder="Phone number" formControlName="phonenumber"/>
-<<<<<<< HEAD
-=======
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="7" nzRequired>Address</nz-form-label>
-      <nz-form-control [nzSpan]="12" nzHasFeedback nzErrorTip="Please input your address!">
-        <input nz-input formControlName="address" placeholder="Address" />
->>>>>>> 3dc8ae6a4a03c7e721fb8018f33805a0ff2db0fd
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-control [nzOffset]="7" [nzSpan]="12">
-        <button nz-button nzType="primary" [disabled]="!validateForm.valid" (click)="onRegister()">Submit</button>
-        <button nz-button (click)="resetForm($event)">Reset</button>
-        <button nz-button routerLink="/login" > Log in </button>
-      </nz-form-control>
-    </nz-form-item>
-  </form>
+<form nz-form [formGroup]="validateForm">
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Name</nz-form-label>
+    <nz-form-control
+      [nzSpan]="12"
+      nzHasFeedback
+      nzValidatingTip="Validating..."
+      [nzErrorTip]="userErrorTpl"
+    >
+      <input nz-input formControlName="name" placeholder="Full Name" />
+      <ng-template #userErrorTpl let-control>
+        @if (control.errors?.['required']) { Please input your username! } @if
+        (control.errors?.['duplicated']) { The username is redundant! }
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>E-mail</nz-form-label>
+    <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="emailErrorTpl">
+      <input
+        nz-input
+        formControlName="email"
+        placeholder="E-mail"
+        type="email"
+      />
+      <ng-template #emailErrorTpl let-control>
+        @if (control.errors?.['email']) { The input is not valid E-mail! } @if
+        (control.errors?.['required']) { Please input your E-mail! }
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Verification Code</nz-form-label>
+    <nz-form-control nzHasFeedback [nzSpan]="12">
+      <input
+        nz-input
+        formControlName="verificationCode"
+        placeholder="Enter verification code"
+      />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-col [nzSpan]="7"></nz-col>
+    <button
+      nz-button
+      nzType="default"
+      (click)="send()"
+      [disabled]="validateForm.get('email')?.invalid || !canResendCode"
+    >
+      @if (canResendCode) { Send Code } @else { Resend Code ({{
+        remainingTime
+      }}s) }
+    </button>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Password</nz-form-label>
+    <nz-form-control
+      [nzSpan]="12"
+      nzHasFeedback
+      nzErrorTip="Please input your password!"
+    >
+      <input
+        nz-input
+        type="password"
+        formControlName="password"
+        placeholder="Password"
+        (ngModelChange)="validateConfirmPassword()"
+      />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Confirm Password</nz-form-label>
+    <nz-form-control
+      [nzSpan]="12"
+      nzHasFeedback
+      [nzErrorTip]="passwordErrorTpl"
+    >
+      <input
+        nz-input
+        type="password"
+        formControlName="confirm"
+        placeholder="Confirm your password"
+      />
+      <ng-template #passwordErrorTpl let-control>
+        @if (control.errors?.['required']) { Please confirm your password! } @if
+        (control.errors?.['confirm']) { Password is inconsistent! }
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Phone Number</nz-form-label>
+    <nz-form-control
+      [nzSpan]="12"
+      nzHasFeedback
+      nzErrorTip="Please add your phone number"
+    >
+      <input
+        nz-input
+        type="phonenumber"
+        placeholder="Phone number"
+        formControlName="phonenumber"
+      />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label [nzSpan]="7" nzRequired>Address</nz-form-label>
+    <nz-form-control
+      [nzSpan]="12"
+      nzHasFeedback
+      nzErrorTip="Please input your address!"
+    >
+      <input nz-input formControlName="address" placeholder="Address" />
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control [nzOffset]="7" [nzSpan]="12">
+      <button
+        nz-button
+        nzType="primary"
+        [disabled]="!validateForm.valid || validateForm.get('verificationCode')?.value !== verificationCode"
+        (click)="onRegister()"
+      >
+        Submit
+      </button>
+      <button nz-button (click)="resetForm($event)">Reset</button>
+      <button nz-button routerLink="/login">Log in</button>
+    </nz-form-control>
+  </nz-form-item>
+</form>

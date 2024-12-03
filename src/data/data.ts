@@ -26,6 +26,7 @@ export interface User {
 }
 
 export interface Doctor {
+  id: string;
   name: string;
   specialization: string;
   tag: string;
@@ -144,8 +145,8 @@ export class UserDataService {
     return dateTime;
   }
 
-  createAppointment(uid: string, doctorName: string, time: string, date: Date, healthCondition: string) {
-    const appointmentId = this.generateAppointmentId(date, time, doctorName);
+  createAppointment(uid: string, doctorId: string, doctorName: string, time: string, date: Date, healthCondition: string) {
+    const appointmentId = this.generateAppointmentId(date, time, doctorId);
     const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
 
     return set(appointmentRef, {
@@ -179,6 +180,14 @@ export class UserDataService {
     return this.currentUser.uid;
   }
 
+  public getCurrentUserEmail(): string {
+    return this.currentUser.email;
+  }
+
+  public getCurrentUserName(): string {
+    return this.currentUser.name;
+  }
+
   async cancelAppointment(appointmentKey: string): Promise<void> {
     const uid = this.getCurrentUserUid();
     const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
@@ -197,38 +206,6 @@ export class System {
 
   // Mock data for doctors
   mockList() {
-    this.doctorList = [
-      {
-        name: 'Dr. Nguyễn Thị Trang',
-        specialization: 'Cardiology',
-        tag: 'tm',
-        imageUrl: 'https://img.freepik.com/free-vector/beautiful-young-female-doctor-crossed-arms-cartoon-illustration_56104-483.jpg?semt=ais_hybrid',
-      },
-      {
-        name: 'Dr. Lê Thị Bảo',
-        specialization: 'Neurology',
-        tag: 'tk',
-        imageUrl: 'https://img.freepik.com/free-vector/beautiful-young-female-doctor-crossed-arms-cartoon-illustration_56104-483.jpg?semt=ais_hybrid',
-      },
-      {
-        name: 'Dr. Trần Thị Yến',
-        specialization: 'Gastroenterology',
-        tag: 'th',
-        imageUrl: 'https://img.freepik.com/free-vector/cute-woman-doctor-holding-syringe-vaccine-hand-drawn-cartoon-art-illustration_56104-966.jpg?semt=ais_hybrid',
-      },
-      {
-        name: 'Dr. Hoàng Minh',
-        specialization: 'Dermatology',
-        tag: 'dl',
-        imageUrl: 'https://img.freepik.com/free-vector/hand-drawn-doctor-cartoon-illustration_23-2150696182.jpg?semt=ais_hybrid',
-      },
-      {
-        name: 'Dr. Phan Thị Thu',
-        specialization: 'Ear, Nose, and Throat',
-        tag: 'tmh',
-        imageUrl: 'https://img.freepik.com/free-vector/beautiful-young-female-doctor-crossed-arms-cartoon-illustration_56104-483.jpg?semt=ais_hybrid',
-      }
-    ];
     this.doctorListAvailable = true;
   }
   async getListDoctor(): Promise<Doctor[]> {

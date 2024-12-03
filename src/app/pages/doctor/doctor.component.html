@@ -24,7 +24,13 @@
           ></nz-card-meta>
         </nz-card>
         <ng-template #coverTemplate>
-          <img alt="{{ doctor.name }}" src="{{ doctor.imageUrl }}" />
+          <div class="doctor-image-container">
+            <img 
+              alt="{{ doctor.name }}" 
+              src="{{ doctor.imageUrl }}" 
+              class="doctor-image"
+            />
+          </div>
         </ng-template>
         <ng-template #actionChoose>
           <button

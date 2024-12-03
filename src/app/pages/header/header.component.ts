@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { PurchaseDrawerComponent } from './purchase-drawer/purchase-drawer.component';
+import { MainStore } from '../main-app.component.store';
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -20,7 +21,8 @@ import { PurchaseDrawerComponent } from './purchase-drawer/purchase-drawer.compo
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild(PurchaseDrawerComponent) drawerComponent!: PurchaseDrawerComponent;
-  user: User = {
+  readonly role$ = this.mainStore.role$;
+  public user: User = {
     name: '',
     phoneNumber: '',
     email: '',
@@ -32,8 +34,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private data: UserDataService,
-    private purchase: PurchaseDrawerComponent
-  ) { }
+    private mainStore: MainStore
+  ) { 
+ 
+  }
 
   ngOnInit(): void {
     this.userSubscription = this.data.getUserData().subscribe(userData => {

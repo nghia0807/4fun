@@ -53,22 +53,6 @@
       <h3>Pick a time that you could make an appointment:</h3>
       <app-time-picker (timeAndDateSelected)="onTimeAndDateChange($event)">
       </app-time-picker>
-      <div
-        *ngIf="
-          form.get('selectedDate')?.touched && form.get('selectedDate')?.invalid
-        "
-        class="error-message"
-      >
-        Please select a date
-      </div>
-      <div
-        *ngIf="
-          form.get('selectedTime')?.touched && form.get('selectedTime')?.invalid
-        "
-        class="error-message"
-      >
-        Please select a time
-      </div>
     </div>
     <div *ngIf="steps === 1">
       <div style="padding-top: 10px;" *ngIf="filteredDoctors$ | async as data">
@@ -90,22 +74,25 @@
               [nzCover]="coverTemplate" 
               [nzActions]="[actionChoose]"
               class="small-card"
+              [class.selected]="selectedDoctor === doctor.id"
             >
               <nz-card-meta
                 [nzTitle]="'Doctor ' + doctor.name"
+                [nzDescription]="doctor.specialization"
               ></nz-card-meta>
             </nz-card>
             <ng-template #coverTemplate>
-              <img alt="{{ doctor.name }}"/>
+              <img [src]="doctor.imageUrl" alt="{{ doctor.name }}"/>
             </ng-template>
             <ng-template #actionChoose>
               <button
                 nz-button
                 nzType="text"
                 nzBlock
+                (click)="selectDoctor(doctor)"
               >
-                Register
-                <span nz-icon nzType="plus-circle" nzTheme="outline"></span>
+                {{ selectedDoctor === doctor.id ? 'Selected' : 'Register' }}
+                <span nz-icon [nzType]="selectedDoctor === doctor.id ? 'check-circle' : 'plus-circle'" nzTheme="outline"></span>
               </button>
             </ng-template>
           </div>
@@ -131,7 +118,13 @@
       >
         Next
       </button>
-      <button *ngIf="steps === 1" nz-button nzType="primary" (click)="submit()">
+      <button 
+        *ngIf="steps === 1" 
+        nz-button 
+        nzType="primary" 
+        (click)="submit()"
+        [disabled]="!selectedDoctor"
+      >
         Submit
       </button>
     </div>

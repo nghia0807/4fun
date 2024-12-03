@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -23,9 +23,8 @@ export class TimePickerComponent implements OnInit {
   availableTimes: { time: string, selected: boolean, disabled?: boolean }[] = [];
   form: FormGroup;
   selectedTimeIndex: number | null = null;
-
+  @Input() disabledTimeStrings: string[] = [];
   @Output() timeAndDateSelected = new EventEmitter<{ time: string, date: Date } | null>();
-
   constructor() {
     this.form = new FormGroup({
       date: new FormControl(null),
@@ -93,7 +92,40 @@ export class TimePickerComponent implements OnInit {
       }
     }
 
-    this.availableTimes.forEach(time => time.disabled = true);
+    this.updateDisabledTimes();
+  }
+
+  updateDisabledTimes() {
+    const selectedDate = this.form.get('date')?.value;
+    
+    if (selectedDate && this.disabledTimeStrings.length > 0) {
+      // Chuyển đổi ngày được chọn sang định dạng YYMMDD
+      const selectedDateStr = this.formatDateToString(selectedDate);
+  
+      this.availableTimes.forEach(timeSlot => {
+        const matchingDisabledTime = this.disabledTimeStrings.some(timeStr => {
+          // Tách date và time từ chuỗi disabled time
+          const [disabledDateStr, disabledTime] = timeStr.split(' ');
+          
+          // Kiểm tra cả date và time
+          return disabledDateStr === selectedDateStr && disabledTime === timeSlot.time;
+        });
+  
+        // Disable time slot nếu được tìm thấy
+        timeSlot.disabled = matchingDisabledTime;
+      });
+    } else {
+      // Reset trạng thái disabled nếu không có time bị disable
+      this.updateAvailableTimes();
+    }
+  }
+  
+  // Thêm phương thức để format date
+  private formatDateToString(date: Date): string {
+    const year = date.getFullYear().toString().slice(2);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}${month}${day}`;
   }
 
   disableDateFn = (current: Date): boolean => {
@@ -107,20 +139,9 @@ export class TimePickerComponent implements OnInit {
     if (date) {
       localStorage.setItem('selectedDate', date.toISOString());
       this.updateAvailableTimes();
+      this.updateDisabledTimes(); // Additional call to handle disabled times
 
-      // Kiểm tra xem time đã chọn trước đó có còn hợp lệ không
-      if (this.selectedTimeIndex !== null) {
-        const selectedTime = this.availableTimes[this.selectedTimeIndex];
-        if (selectedTime && !selectedTime.disabled) {
-          this.timeAndDateSelected.emit({
-            time: selectedTime.time,
-            date: date
-          });
-        } else {
-          // Nếu time không còn hợp lệ, xóa selection
-          this.clearTimeSelection();
-        }
-      }
+      // Rest of the existing method remains the same...
     } else {
       this.clearSelections();
     }
@@ -213,5 +234,10 @@ export class TimePickerComponent implements OnInit {
     localStorage.removeItem('selectedTime');
     localStorage.removeItem('selectedTimeIndex');
     this.timeAndDateSelected.emit(null);
+  }
+
+  @Input() set disabledTimes(timeStrings: string[]) {
+    this.disabledTimeStrings = timeStrings;
+    this.updateDisabledTimes();
   }
 }

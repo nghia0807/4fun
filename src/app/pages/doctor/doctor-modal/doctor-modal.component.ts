@@ -15,6 +15,8 @@ import { Subscription } from 'rxjs';
 import { catchError, concatMap, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { EmailVerificationService } from '../../../../component/email';
+import { HeaderComponent } from '../../header/header.component';
 
 interface TimeAndDateSelection {
   time: string;
@@ -47,6 +49,7 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private valueSubscription?: Subscription;
   doctor: string = '';
+  doctorId: string ='';
   @ViewChild(TimePickerComponent) timePickerComponent!: TimePickerComponent;
 
   form = new UntypedFormGroup({
@@ -60,18 +63,18 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
     private timePicker: TimePickerComponent,// Inject TimePickerComponent
     private message: NzMessageService,
     private userDataService: UserDataService,
+    private emailVerificationService: EmailVerificationService,
   ) { }
 
   ngOnInit() {
     localStorage.removeItem('selectedDate');
     localStorage.removeItem('selectedTime');
-
-    // Modified subscription to prevent infinite loops
     this.valueSubscription = this.form_value$
       .pipe(takeUntil(this.destroy$))
       .subscribe((x) => {
         if (x && x.name) {
           this.doctor = x.name;
+          this.doctorId = x.id;
         }
         else {
           this.doctor = '';
@@ -127,20 +130,28 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
         selectedTime: this.form.get('selectedTime')?.value,
         comment: this.form.get('comment')?.value
       };
-      console.log(formData, this.doctor);
       this.message
         .loading('Action in progress', { nzDuration: 2500 })
         .onClose!.pipe(
           concatMap(() => {
             const uid = this.userDataService.getCurrentUserUid();
             if (formData.selectedDate) {
-              return this.userDataService.createAppointment(uid, this.doctor, formData.selectedTime, formData.selectedDate, formData.comment);
+              return this.userDataService.createAppointment(uid,this.doctorId, this.doctor, formData.selectedTime, formData.selectedDate, formData.comment);
             } else {
               throw new Error('Selected date is null');
             }
           }),
           concatMap((appointmentId) => {
-            console.log('Appointment created with ID:', appointmentId);
+            const email = this.userDataService.getCurrentUserEmail();
+            const name = this.userDataService.getCurrentUserName();
+            this.emailVerificationService.sendAppointmentEmail(
+              email,
+              name,
+              appointmentId,
+              formData.selectedDate.toLocaleDateString(),
+              formData.selectedTime,
+              this.doctor
+            );
             return this.message.success('Appointment registered successfully', { nzDuration: 2500 }).onClose!;
           }),
           catchError((error) => {

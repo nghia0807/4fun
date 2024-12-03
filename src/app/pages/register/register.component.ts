@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import {
   AbstractControl,
@@ -9,17 +9,20 @@ import {
   ValidationErrors,
   ValidatorFn,
   Validators,
-  ReactiveFormsModule
+  ReactiveFormsModule,
+  UntypedFormGroup,
+  UntypedFormControl
 } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { Observable, Observer } from 'rxjs';
+import { interval, Observable, Observer, Subscription } from 'rxjs';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { submitRegister } from './registerData';
 import { AuthService } from '../auth.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { UserDataService } from '../../../data/data';
-
+import { EmailVerificationService } from '../../../component/email';
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -29,32 +32,38 @@ import { UserDataService } from '../../../data/data';
     RouterLink,
     NzButtonComponent,
     NzInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
-export class RegisterComponent {
-  validateForm: FormGroup<{
-    name: FormControl<string>;
-    email: FormControl<string>;
-    password: FormControl<string>;
-    confirm: FormControl<string>;
-    phonenumber: FormControl<string>;
-    address: FormControl<string>;  // New field
-  }>;
-
-  submitForm(): void {
-    console.log('submit', this.validateForm.value);
+export class RegisterComponent implements OnInit {
+  remainingTime = 30;
+  canResendCode = true;
+  countdownSubscription: Subscription | null = null;
+  verificationCode = '';
+  validateForm = new UntypedFormGroup({
+    name: new UntypedFormControl(null, [Validators.required]),
+    email: new UntypedFormControl(null, [Validators.required]),
+    password: new UntypedFormControl(null, [Validators.required]),
+    confirm: new UntypedFormControl(null, [Validators.required]),
+    phonenumber: new UntypedFormControl(null, [Validators.required]),
+    address: new UntypedFormControl(null, [Validators.required]),
+    verificationCode: new UntypedFormControl(null, [Validators.required]),
+  });
+  
+  ngOnInit(): void {
+      this.validateForm.get('verificationCode')?.setValidators(this.validationCode(this.validateForm));
   }
-
+  
   resetForm(e: MouseEvent): void {
     e.preventDefault();
     this.validateForm.reset();
   }
 
   validateConfirmPassword(): void {
-    setTimeout(() => this.validateForm.controls.confirm.updateValueAndValidity());
+    setTimeout(() => this.validateForm.get('password')?.updateValueAndValidity());
   }
 
   userNameAsyncValidator: AsyncValidatorFn = (control: AbstractControl) =>
@@ -73,7 +82,7 @@ export class RegisterComponent {
   confirmValidator: ValidatorFn = (control: AbstractControl) => {
     if (!control.value) {
       return { error: true, required: true };
-    } else if (control.value !== this.validateForm.controls.password.value) {
+    } else if (control.value !== this.validateForm.get('password')?.value) {
       return { confirm: true, error: true };
     }
     return {};
@@ -84,16 +93,21 @@ export class RegisterComponent {
     private router: Router,
     private authService: AuthService,
     private message: NzMessageService,
-    private userDataService: UserDataService // Add this line
+    private userDataService: UserDataService, // Add this line
+    private emailVerificationService: EmailVerificationService
   ) {
-    this.validateForm = this.fb.group({
-      name: ['', [Validators.required]],  // Changed from userName to name
-      email: ['', [Validators.email, Validators.required]],
-      password: ['', [Validators.required]],
-      confirm: ['', [this.confirmValidator]],
-      phonenumber: ['', [Validators.required]],
-      address: ['', [Validators.required]]  // New field
-    });
+  }
+  send() {
+    this.verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const email = this.validateForm.value.email ?? '';
+    this.emailVerificationService.sendVerificationEmail(email, this.verificationCode)
+      .then(() => {
+        this.message.success('Verification code sent to your email');
+        this.startCountdown();
+      })
+      .catch((error) => {
+        this.message.error('Failed to send verification code');
+      });
   }
 
   onRegister() {
@@ -107,7 +121,7 @@ export class RegisterComponent {
       .then((result) => {
         if (result.status === "success") {
           this.authService.login();
-          this.router.navigate(['main/welcome']);
+          this.router.navigate(['main-bn/welcome']);
           this.message.success('Register successfully');
           // Trigger a refresh of user data
           if ('user' in result) {
@@ -117,5 +131,45 @@ export class RegisterComponent {
           this.message.error('Register failed');
         }
       })
+  }
+
+  startCountdown() {
+    // Reset countdown parameters
+    this.remainingTime = 30;
+    this.canResendCode = false;
+
+    // Cancel any existing countdown
+    if (this.countdownSubscription) {
+      this.countdownSubscription.unsubscribe();
+    }
+
+    // Create a new countdown
+    this.countdownSubscription = interval(1000).subscribe(() => {
+      this.remainingTime--;
+
+      // When countdown reaches zero
+      if (this.remainingTime <= 0) {
+        this.canResendCode = true;
+
+        // Stop the countdown
+        if (this.countdownSubscription) {
+          this.countdownSubscription.unsubscribe();
+        }
+      }
+    });
+  }
+
+  validationCode(form: any): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (!form.get('email')?.value) {
+        return null;
+      }
+      if (form.get('email')?.value && !value) return { required: true };
+      if (form.get('email')?.value && value != this.verificationCode) {
+        return { invalid: true };
+      }
+      return null;
+    }
   }
 }

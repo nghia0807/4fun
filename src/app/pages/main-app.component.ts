@@ -47,7 +47,7 @@ export class MainAppComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private mainStore: MainStore,
-  ){
+  ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -69,7 +69,7 @@ export class MainAppComponent implements OnInit {
     this.hightLightSlider(true);
   }
 
-  nextWelcome () {
+  nextWelcome() {
     this.hightLightSlider(false);
     this.hightLightContentWelcome(true);
   }
@@ -79,6 +79,7 @@ export class MainAppComponent implements OnInit {
   }
 
   nextAppointment() {
+    this.hightLightContentDoctor(false);
     this.hightLightAppointment(true);
   }
   //back
@@ -98,7 +99,7 @@ export class MainAppComponent implements OnInit {
     this.hightLightAppointment(false);
     this.hightLightContentDoctor(true);
   }
-  logOut(){
+  logOut() {
     this.authService.logout();
     this.router.navigate(['']);
   }
@@ -108,12 +109,12 @@ export class MainAppComponent implements OnInit {
     this.headerGuide = value;
     this.mainStore.setBluredSlider(value);
     this.mainStore.setBluredContent(value);
-    if(value === true) {this.mainStore.setBluredHeader(!value);}
+    if (value === true) { this.mainStore.setBluredHeader(!value); }
   }
 
   hightLightSlider(value: boolean) {
     this.sliderGuider = value;
-    if(value === true) {
+    if (value === true) {
       this.mainStore.setBluredSlider(!value);
     }
     this.mainStore.setBluredHeader(value);
@@ -123,7 +124,7 @@ export class MainAppComponent implements OnInit {
   hightLightContentWelcome(value: boolean) {
     this.goToWelcome();
     this.welcomeGuider = value;
-    if(value === true) {
+    if (value === true) {
       this.mainStore.setBluredContent(!value);
     }
     this.mainStore.setBluredSlider(value);
@@ -131,36 +132,26 @@ export class MainAppComponent implements OnInit {
   }
 
   hightLightContentDoctor(value: boolean) {
-    this.goToDoctor();
     this.doctorGuider = value;
-    if(value === true) {
-      this.mainStore.setBluredContent(!value);
-    }
-    this.mainStore.setBluredSlider(value);
-    this.mainStore.setBluredHeader(value);
+    this.goToDoctor();
   }
 
-  hightLightAppointment( value: boolean) {
+  hightLightAppointment(value: boolean) {
     this.goAppoinment();
     this.appointmentGuider = value;
-    if(value === true) {
-      this.mainStore.setBluredContent(!value);
-    }
-    this.mainStore.setBluredSlider(value);
-    this.mainStore.setBluredHeader(value);
   }
   goToWelcome() {
     this.currentRoute = 'welcome';
-    this.router.navigate(['/main/welcome']);
+    this.router.navigate(['/main-bn/welcome']);
   }
 
   goToDoctor() {
     this.currentRoute = 'doctor';
-    this.router.navigate(['/main/doctor']);
+    this.router.navigate(['/main-bn/doctor']);
   }
 
   goAppoinment() {
     this.currentRoute = 'monitor';
-    this.router.navigate(['/main/monitor']);
+    this.router.navigate(['/main-bn/monitor']);
   }
 }
