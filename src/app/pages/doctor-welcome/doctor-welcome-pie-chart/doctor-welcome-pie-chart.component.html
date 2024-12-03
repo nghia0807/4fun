@@ -1,0 +1,21 @@
+<div class="chart-container">
+  <div class="chart-wrapper">
+    <svg width="500" height="500" viewBox="0 0 300 300">
+      <g *ngFor="let slice of chartData" 
+         [attr.transform]="'translate(150, 150)'">
+        <path 
+          [attr.d]="slice.path" 
+          [attr.fill]="slice.color"
+        />
+      </g>
+    </svg>
+    <div class="legend">
+      <div *ngFor="let slice of chartData" class="legend-item">
+        <span class="color-box" [style.background-color]="slice.color"></span>
+        <span class="legend-text">
+          {{ slice.label }}: {{ slice.count }} ({{ slice.percentage | number:'0.1-1' }}%)
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

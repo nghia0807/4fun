@@ -29,6 +29,10 @@ export class WelcomeFormComponent implements OnInit {
   selectedDoctorFullName: string | null = null;
   @ViewChild(TimePickerComponent)
   timePickerComponent!: TimePickerComponent;
+  disableTime = [
+    '241204 14:30',
+    '241204 15:00'
+  ]
   form = new UntypedFormGroup({
     selectedType: new UntypedFormControl(null, [Validators.required]),
     comment: new UntypedFormControl(null, [Validators.required, Validators.maxLength(500)]),

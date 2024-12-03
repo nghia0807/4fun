@@ -28,10 +28,9 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { TimePickerComponent } from '../doctor/time-picker/time-picker.component';
-import { DoctorHandleAppointmentComponent } from './doctor-handle-appointment.component';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
-import { DoctorHandleFormComponent } from './doctor-handle-form/doctor-handle-form.component';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { DoctorAppoinmentHistoryComponent } from './doctor-appoinment-history.component';
 const NzModules = [
   NzPaginationModule,
   NzLayoutModule,
@@ -65,7 +64,7 @@ const NzModules = [
 ];
 
 @NgModule({
-  declarations: [ DoctorHandleAppointmentComponent, DoctorHandleFormComponent ],
+  declarations: [ DoctorAppoinmentHistoryComponent ],
   imports: [
     CommonModule,
     ...NzModules,
@@ -74,9 +73,9 @@ const NzModules = [
     RouterModule.forChild([
       {
         path: '',
-        component: DoctorHandleAppointmentComponent,
+        component: DoctorAppoinmentHistoryComponent,
       },
     ]),
   ]
 })
-export class DoctorHandleAppointmentModule { }
+export class DoctorAppoinmentHistoryModule { }

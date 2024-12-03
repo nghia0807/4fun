@@ -1,11 +1,14 @@
 <div style="margin: 15px">
   <div class="table-title-container mb-4">
-    <h2 class="text-xl font-semibold">Appointment List <nz-date-picker
-      style="float: right; margin: 10px"
-      nzMode="month"
-      [(ngModel)]="selectedMonth"
-      [nzFormat]="monthFormat"
-    ></nz-date-picker></h2>
+    <h2 class="text-xl font-semibold">
+      Appointment History
+      <nz-date-picker
+        style="float: right; margin: 10px"
+        nzMode="month"
+        [(ngModel)]="selectedMonth"
+        [nzFormat]="monthFormat"
+      ></nz-date-picker>
+    </h2>
   </div>
 
   <nz-table
@@ -21,17 +24,16 @@
         <th>Date</th>
         <th>Time</th>
         <th>Status</th>
-        <th>Action</th>
       </tr>
     </thead>
     <tbody>
       @for (data of basicTable.data; track data) {
-      <tr>
+      <tr class="empty-row">
         <!-- <td>{{ data.id }}</td> -->
         <td>{{ data.patientName }}</td>
         <td>{{ data.time }}</td>
         <td>{{ formatDate(data.appointmentDate) }}</td>
-        <td style="width: 150px">
+        <td style="width: 100px;">
           <nz-tag
             *ngIf="getStatusConfig(data.status)"
             [nzColor]="getStatusConfig(data.status)?.color"
@@ -39,14 +41,9 @@
             {{ getStatusConfig(data.status)?.label }}
           </nz-tag>
         </td>
-        <td style="width: 300px">
-          <a nz-button nzType="text" (click)="openMeeting()">In Meeting</a>
-          <a nz-button nzType="text" nzDanger>Cancle appointment</a>
-        </td>
         } @for (emptyRow of getEmptyRows(7 - basicTable.data.length); track
         emptyRow) {
       <tr class="empty-row">
-        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -56,7 +53,7 @@
       }
     </tbody>
   </nz-table>
-  <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+  <div style="display: flex; justify-content: flex-end; margin-top: 10px">
     <nz-pagination
       [nzPageIndex]="pageIndex"
       [nzTotal]="appointments.length"
@@ -66,4 +63,3 @@
     </nz-pagination>
   </div>
 </div>
-<app-doctor-handle-form></app-doctor-handle-form>

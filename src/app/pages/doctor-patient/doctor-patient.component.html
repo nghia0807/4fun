@@ -1,1 +1,67 @@
-<p>doctor-patient works!</p>
+<div style="padding: 10px">
+  <nz-input-group nzPrefixIcon="search">
+    <input
+      nz-input
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="filterPatients()"
+      placeholder="Search patients by name or phoneNumber"
+    />
+  </nz-input-group>
+
+  <nz-list [nzDataSource]="filteredPatients">
+    <nz-list-item
+      *ngFor="let patient of filteredPatients"
+      style="
+        background-color: rgb(255, 255, 255);
+        padding: 0;
+        margin: 5px 0;
+        border-radius: 4px;
+        border: 1px solid #cbc8c8;
+      "
+    >
+        <div style="display: flex; flex-direction: column; width: 100%;">
+            <div style="background-color: #fafafa; padding: 10px">
+              <strong>{{ patient.name }}</strong>
+            </div>
+            <div>
+                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                    <div style="padding: 10px;">
+                      <p>Email: {{ patient.email }}</p>
+                      <p>Phone: {{ patient.phoneNumber }}</p>
+                      <p>Address: {{ patient.address }}</p>
+                    </div>
+                    <ul nz-list-item-actions>
+                      <nz-list-item-action>
+                        <a (click)="openAppointmentDrawer(patient)">See Appointment list</a>
+                      </nz-list-item-action>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nz-list-item>
+  </nz-list>
+  
+  <nz-drawer
+      [nzVisible]="drawerVisible"
+      nzPlacement="right"
+      [nzTitle]="'Appointments for ' + selectedPatient?.name"
+      (nzOnClose)="closeDrawer()"
+    >
+      <ng-container *nzDrawerContent>
+        <nz-list *ngIf="patientAppointments.length > 0; else noAppointments">
+          <nz-list-item *ngFor="let appointment of patientAppointments">
+            <div>
+              <strong>Doctor: {{ appointment.doctorName }}</strong>
+              <p>Date: {{ appointment.appointmentDate | date:'mediumDate' }}</p>
+              <p>Time: {{ appointment.appointmentTime }}</p>
+              <p>Health Condition: {{ appointment.healthCondition }}</p>
+              <p>Created At: {{ appointment.createdAt | date:'medium' }}</p>
+            </div>
+          </nz-list-item>
+        </nz-list>
+        <ng-template #noAppointments>
+          <p>No appointments found for this patient.</p>
+        </ng-template>
+      </ng-container>
+    </nz-drawer>
+</div>

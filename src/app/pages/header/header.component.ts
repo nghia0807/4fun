@@ -28,6 +28,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     email: '',
     address: '',
     turn: 0,
+    appointments: []
   };
 
   private userSubscription: Subscription | undefined;
@@ -36,11 +37,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private data: UserDataService,
     private mainStore: MainStore
   ) { 
- 
-  }
-
-  ngOnInit(): void {
-    this.userSubscription = this.data.getUserData().subscribe(userData => {
+    this.data.getUserData().subscribe(userData => {
       if (userData) {
         this.user = {
           name: userData.name || '',
@@ -48,11 +45,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
           email: userData.email || '',
           address: userData.address || '',
           turn: userData.turn || 0,
+          appointments: []
         };
-      } else {
-        // Reset user data
+      }
+      else {
+        this.user = {
+          name: '',
+          phoneNumber: '',
+          email: '',
+          address:  '',
+          turn:  0,
+          appointments: []
+        };
       }
     });
+  }
+
+  ngOnInit(): void {
+    
   }
 
   ngOnDestroy(): void {

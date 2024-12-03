@@ -23,6 +23,15 @@ export interface User {
   email: string;
   address: string;
   turn: number;
+  appointments: AppointmentData[]
+}
+
+export interface AppointmentData {
+  appointmentDate: string;
+  appointmentTime: string;
+  doctorName: string;
+  createdAt: string;
+  healthCondition: string;
 }
 
 export interface Doctor {
@@ -69,6 +78,43 @@ export class UserDataService {
         this.userDataSubject.next(null);
       }
     });
+  }
+
+  async getAllPatients(): Promise<User[]> {
+    const patientsRef = ref(db, 'users');
+    try {
+      const snapshot = await get(patientsRef);
+      if (snapshot.exists()) {
+        const users = snapshot.val() as Record<string, any>;
+        return Object.entries(users).map(([uid, userData]) => ({
+          uid,
+          name: userData.name || '',
+          phoneNumber: userData.phoneNumber || '',
+          email: userData.email || '',
+          address: userData.address || '',
+          turn: 0, // Adding turn to match User interface
+          appointments: userData.appointments 
+            ? Object.entries(userData.appointments)
+              .filter(([_, appointmentData]) => typeof appointmentData === 'object')
+              .map(([key, appointmentData]) => {
+                const appointment = appointmentData as AppointmentData;
+                return {
+                  key,
+                  doctorName: appointment.doctorName || '',
+                  appointmentDate: appointment.appointmentDate || '',
+                  appointmentTime: appointment.appointmentTime || '',
+                  createdAt: appointment.createdAt || '',
+                  healthCondition: appointment.healthCondition || ''
+                };
+              })
+            : []
+        })) as User[];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+      return [];
+    }
   }
 
   private fetchUserData(uid: string) {
@@ -211,17 +257,16 @@ export class System {
   async getListDoctor(): Promise<Doctor[]> {
 
     if (this.doctorListAvailable) return this.doctorList;
-    const snapShot=await get(ref(db,'doctors'));
-    if(snapShot.exists())
-    {
-      const data=snapShot.val();
-      this.doctorList=Object.values(data);
+    const snapShot = await get(ref(db, 'doctors'));
+    if (snapShot.exists()) {
+      const data = snapShot.val();
+      this.doctorList = Object.values(data);
     }
     if (this.doctorList.length === 0) {
       this.mockList();
       for (const doctor of this.doctorList) {
-        const doctorRef=ref(db,'doctors/'+doctor.tag);
-        await set(doctorRef,doctor);
+        const doctorRef = ref(db, 'doctors/' + doctor.tag);
+        await set(doctorRef, doctor);
       }
     }
     return this.doctorList;

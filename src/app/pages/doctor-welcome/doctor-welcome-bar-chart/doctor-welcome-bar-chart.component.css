@@ -1,0 +1,19 @@
+.bar-chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    padding-top: 100px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .chart-title {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
+  }
+  .chart-wrapper {
+    width: 100%;
+  }

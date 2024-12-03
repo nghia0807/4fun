@@ -1,1 +1,15 @@
-<p>doctor-welcome works!</p>
+<h2 style="text-align: center">Appointment Status Overview In Month</h2>
+<nz-date-picker
+  style="float: right; margin: 10px"
+  nzMode="month"
+  [(ngModel)]="selectedMonth"
+  [nzFormat]="monthFormat"
+></nz-date-picker>
+<div style="display: flex; flex-direction: row; justify-content: space-around">
+  <app-doctor-welcome-pie-chart
+    [appointments]="listData"
+  ></app-doctor-welcome-pie-chart>
+  <app-doctor-welcome-bar-chart
+    [appointments]="listData"
+  ></app-doctor-welcome-bar-chart>
+</div>

@@ -1,0 +1,36 @@
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  max-width: 600px; /* Increased from 400px */
+  margin: 0 auto;
+}
+.chart-title {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+.chart-wrapper {
+  display: flex;
+  align-items: center;
+}
+.legend {
+  margin-left: 30px; /* Increased from 20px */
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.color-box {
+  width: 25px; /* Increased from 20px */
+  height: 25px; /* Increased from 20px */
+  margin-right: 10px;
+  border-radius: 4px;
+}
+.legend-text {
+  font-size: 14px;
+}

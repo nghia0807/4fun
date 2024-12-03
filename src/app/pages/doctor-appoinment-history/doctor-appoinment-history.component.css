@@ -1,0 +1,10 @@
+.empty-row {
+    height: 65px;
+    /* Điều chỉnh chiều cao này phù hợp với chiều cao của một hàng dữ liệu thực tế */
+}
+
+.empty-row td {
+    background-color: transparent !important;
+    border-bottom: 1px solid #f0f0f0;
+    /* Màu border giống với bảng gốc */
+}

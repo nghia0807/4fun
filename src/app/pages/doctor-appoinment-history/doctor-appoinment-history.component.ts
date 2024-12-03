@@ -1,9 +1,5 @@
-// doctor-handle-appointment.component.ts
-import { Component, OnInit } from '@angular/core';
-import { NzModalService } from 'ng-zorro-antd/modal';
+import { Component } from '@angular/core';
 import { AppointmentStatus, ListOfAppointmentStatus } from '../../../component/enum';
-import { DoctorHandleStore } from './doctor-handle.store';
-
 interface Appointment {
   id: number;
   patientName: string;
@@ -12,15 +8,12 @@ interface Appointment {
   status: AppointmentStatus;
   appointmentDate: Date;
 }
-
 @Component({
-  selector: 'app-doctor-handle-appointment',
-  templateUrl: './doctor-handle-appointment.component.html',
-  styleUrls: ['./doctor-handle-appointment.component.css'],
-  providers: [DoctorHandleStore]
+  selector: 'app-doctor-appoinment-history',
+  templateUrl: './doctor-appoinment-history.component.html',
+  styleUrl: './doctor-appoinment-history.component.css'
 })
-export class DoctorHandleAppointmentComponent implements OnInit {
-  // Mock appointments data
+export class DoctorAppoinmentHistoryComponent {
   appointments: Appointment[] = [
     {
       id: 1,
@@ -131,14 +124,11 @@ export class DoctorHandleAppointmentComponent implements OnInit {
   }
 
   get paginatedAppointments(): Appointment[] {
-    // Ensure sorting is applied
     this.sortAppointments();
-
-    // Calculate start and end indices for pagination
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    
-    // Return sliced and sorted appointments
+    //xử lí lọc theo selectedMonth
+    console.log(this.selectedMonth);
     return this.appointments.slice(startIndex, endIndex);
   }
 
@@ -176,7 +166,7 @@ export class DoctorHandleAppointmentComponent implements OnInit {
 
 
   constructor(
-    private store: DoctorHandleStore
+
   ) { }
 
   ngOnInit() {
@@ -191,16 +181,4 @@ export class DoctorHandleAppointmentComponent implements OnInit {
     return new Array(count).fill(null);
   }
 
-  openMeeting() {
-    this.store.setIsMeeting(true);
-    //CÁCH GÁN GIÁ TRỊ
-    this.store.setMeetingValue({
-      id: 0,
-      patientName: 'test',
-      address: 'test',
-      birth: new Date(),
-      comment: 'test',
-      appointmentDate: new Date()
-    })
-  }
 }

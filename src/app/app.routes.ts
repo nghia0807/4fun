@@ -72,6 +72,14 @@ export const routes: Routes = [
       {
         path: 'appointment',
         loadChildren: () => import('./pages/doctor-handle-appointment/doctor-handle.module').then((m) => m.DoctorHandleAppointmentModule)
+      },
+      {
+        path: 'appointment-history',
+        loadChildren: () => import('./pages/doctor-appoinment-history/doctor-appoinment-history.module').then((m) => m.DoctorAppoinmentHistoryModule)
+      },
+      {
+        path: 'paitents',
+        loadChildren: () => import('./pages/doctor-patient/doctor-patient.module').then((m) => m.DoctorPaitentModule)
       }
     ]
   }

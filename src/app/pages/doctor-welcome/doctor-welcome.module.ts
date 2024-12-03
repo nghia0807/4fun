@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -29,6 +29,8 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { TimePickerComponent } from '../doctor/time-picker/time-picker.component';
 import { DoctorWelcomeComponent } from './doctor-welcome.component';
+import { DoctorWelcomePieChartComponent } from './doctor-welcome-pie-chart/doctor-welcome-pie-chart.component';
+import { DoctorWelcomeBarChartComponent } from './doctor-welcome-bar-chart/doctor-welcome-bar-chart.component';
 const NzModules = [
   NzImageModule,
   NzIconModule,
@@ -56,10 +58,11 @@ const NzModules = [
   NzStepsModule,
   NzTableModule,
   NzAvatarModule,
+  FormsModule
 ];
 
 @NgModule({
-  declarations: [ DoctorWelcomeComponent ],
+  declarations: [ DoctorWelcomeComponent, DoctorWelcomePieChartComponent, DoctorWelcomeBarChartComponent ],
   imports: [
     CommonModule,
     ...NzModules,
@@ -71,6 +74,7 @@ const NzModules = [
         component: DoctorWelcomeComponent,
       },
     ]),
-  ]
+  ],
+  providers: [DecimalPipe]
 })
 export class DoctorWelcomeModule { }

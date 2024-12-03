@@ -28,11 +28,12 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { TimePickerComponent } from '../doctor/time-picker/time-picker.component';
-import { DoctorHandleAppointmentComponent } from './doctor-handle-appointment.component';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
-import { DoctorHandleFormComponent } from './doctor-handle-form/doctor-handle-form.component';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { DoctorPatientComponent } from './doctor-patient.component';
+import { NzListModule } from 'ng-zorro-antd/list';
 const NzModules = [
+  NzListModule,
   NzPaginationModule,
   NzLayoutModule,
   NzImageModule,
@@ -65,7 +66,7 @@ const NzModules = [
 ];
 
 @NgModule({
-  declarations: [ DoctorHandleAppointmentComponent, DoctorHandleFormComponent ],
+  declarations: [ DoctorPatientComponent ],
   imports: [
     CommonModule,
     ...NzModules,
@@ -74,9 +75,9 @@ const NzModules = [
     RouterModule.forChild([
       {
         path: '',
-        component: DoctorHandleAppointmentComponent,
+        component: DoctorPatientComponent,
       },
     ]),
   ]
 })
-export class DoctorHandleAppointmentModule { }
+export class DoctorPaitentModule { }
