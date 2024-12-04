@@ -28,7 +28,8 @@ const initialState: DoctorState = {
     name: '',
     specialization: '',
     tag: '',
-    imageUrl: ''
+    imageUrl: '',
+    description:'',
   },
   initial_tag: 'all',
 };

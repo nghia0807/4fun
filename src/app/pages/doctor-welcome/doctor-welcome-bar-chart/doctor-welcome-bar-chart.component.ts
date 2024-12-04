@@ -19,14 +19,16 @@ export class DoctorWelcomeBarChartComponent {
     [AppointmentStatus.CANCEL]: 'Cancelled',
     [AppointmentStatus.MEETING]: 'Ongoing',
     [AppointmentStatus.READY]: 'Ready',
-    [AppointmentStatus.ENDING]: 'Ending Soon'
+    [AppointmentStatus.ENDED]: 'ENDED Soon',
+    [AppointmentStatus.PRESERVED]:'Preserved',
   };
 
   private readonly COLORS = {
     [AppointmentStatus.CANCEL]: '#FF6384',
     [AppointmentStatus.MEETING]: '#36A2EB',
     [AppointmentStatus.READY]: '#4CAF50',
-    [AppointmentStatus.ENDING]: '#FFA500'
+    [AppointmentStatus.ENDED]: '#FFA500',
+      [AppointmentStatus.PRESERVED]: '#FFA500'
   };
 
   ngOnInit() {
@@ -41,7 +43,7 @@ export class DoctorWelcomeBarChartComponent {
 
     this.chartData = this.appointments.map((item, index) => {
       const height = (item.count / maxCount) * chartHeight;
-      
+
       return {
         status: item.status,
         label: this.STATUS_LABELS[item.status],

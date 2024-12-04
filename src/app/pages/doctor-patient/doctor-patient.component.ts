@@ -10,15 +10,15 @@ export class DoctorPatientComponent {
   patients: User[] = [];
   filteredPatients: User[] = [];
   searchTerm: string = '';
-  
+
   drawerVisible = false;
   selectedPatient: User | null = null;
   patientAppointments: AppointmentData[] = [];
 
   constructor(private userDataService: UserDataService) {}
 
-  ngOnInit() {
-    this.loadPatients();
+  async ngOnInit() {
+    await this.loadPatients();
   }
 
   async loadPatients() {
@@ -30,7 +30,7 @@ export class DoctorPatientComponent {
     if (!this.searchTerm) {
       this.filteredPatients = [...this.patients];
     } else {
-      this.filteredPatients = this.patients.filter(patient => 
+      this.filteredPatients = this.patients.filter(patient =>
         patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         patient.phoneNumber.includes(this.searchTerm.toLowerCase())
       );

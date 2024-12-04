@@ -4,7 +4,7 @@ import { HistoryListComponent } from './history-list/history-list.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { CommonModule } from '@angular/common';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { Appointment } from '../../../data/data';
+import { AppointmentData } from '../../../data/data';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 @Component({
   selector: 'app-monitor',
@@ -22,9 +22,9 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
 })
 export class MonitorComponent {
   visibleView = false;
-  selectedAppointment: Appointment | null = null;
+  selectedAppointment: AppointmentData | null = null;
 
-  openDrawer(appointment: Appointment) {
+  openDrawer(appointment: AppointmentData) {
     this.selectedAppointment = appointment;
     this.visibleView = true;
   }

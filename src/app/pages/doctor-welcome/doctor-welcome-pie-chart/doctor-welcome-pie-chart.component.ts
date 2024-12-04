@@ -16,7 +16,8 @@ export class DoctorWelcomePieChartComponent {
     [AppointmentStatus.CANCEL]: 'Cancelled Appointments',
     [AppointmentStatus.MEETING]: 'Ongoing Meetings',
     [AppointmentStatus.READY]: 'Ready for Meeting',
-    [AppointmentStatus.ENDING]: 'Ending Soon'
+    [AppointmentStatus.ENDED]: 'ENDED Soon',
+    [AppointmentStatus.PRESERVED]: 'Preserved Appointments',
   };
 
   chartData: any[] = [];
@@ -24,7 +25,8 @@ export class DoctorWelcomePieChartComponent {
     [AppointmentStatus.CANCEL]: '#FF6384',
     [AppointmentStatus.MEETING]: '#36A2EB',
     [AppointmentStatus.READY]: '#4CAF50',
-    [AppointmentStatus.ENDING]: '#FFA500'
+    [AppointmentStatus.ENDED]: '#FFA500',
+    [AppointmentStatus.PRESERVED]: 'Preserved Appointments',
   };
 
   ngOnInit() {
@@ -63,7 +65,7 @@ export class DoctorWelcomePieChartComponent {
     const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
     return [
-      "M", start.x, start.y, 
+      "M", start.x, start.y,
       "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
       "L", 0, 0,
       "Z"
