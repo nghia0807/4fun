@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getDatabase, ref, set, get, update, remove } from "firebase/database";
+import { getDatabase, ref, set, get, update } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './firebaseConfig';
@@ -40,7 +40,9 @@ export interface Doctor {
   specialization: string;
   tag: string;
   imageUrl: string;
+  description: string;
 }
+
 //use for the table
 export interface UserAppointment {
   id: number;
@@ -93,7 +95,7 @@ export class UserDataService {
           email: userData.email || '',
           address: userData.address || '',
           turn: 0, // Adding turn to match User interface
-          appointments: userData.appointments 
+          appointments: userData.appointments
             ? Object.entries(userData.appointments)
               .filter(([_, appointmentData]) => typeof appointmentData === 'object')
               .map(([key, appointmentData]) => {
@@ -140,6 +142,7 @@ export class UserDataService {
   async getAppointments(includeHistory: boolean = false): Promise<Appointment[]> {
     const uid = this.getCurrentUserUid();
     const appointmentsRef = ref(db, `users/${uid}/appointments`);
+
 
     try {
       const snapshot = await get(appointmentsRef);
@@ -190,18 +193,21 @@ export class UserDataService {
     dateTime.setHours(hours, minutes, 0, 0);
     return dateTime;
   }
-
-  createAppointment(uid: string, doctorId: string, doctorName: string, time: string, date: Date, healthCondition: string) {
+  createAppointment(uid: string, doctorId: string, doctorName: string, time: string, date: Date) {
     const appointmentId = this.generateAppointmentId(date, time, doctorId);
     const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
-
     return set(appointmentRef, {
-      doctorName: doctorName,
-      appointmentTime: time,
-      appointmentDate: date.toISOString(),
-      healthCondition: healthCondition,
-      createdAt: new Date().toISOString()
-    })
+      // doctorName: doctorName,
+      // appointmentTime: time,
+      // appointmentDate: date.toISOString(),
+      // healthCondition: healthCondition,
+      // createdAt: new Date().toISOString()
+      key:appointmentId,
+      doctor: doctorId,
+      date: date.toISOString(),
+      time: time,
+      status: AppointmentStatus.READY,
+    } as Appointment)
       .then(() => {
         console.log("Appointment created successfully.");
         return appointmentId; // Return the new appointment ID
@@ -211,7 +217,6 @@ export class UserDataService {
         throw error;
       });
   }
-
   private generateAppointmentId(date: Date, time: string, doctorName: string): string {
     const year = date.getFullYear().toString().slice(-2);
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -238,7 +243,8 @@ export class UserDataService {
     const uid = this.getCurrentUserUid();
     const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
     try {
-      await remove(appointmentRef);
+      // await remove(appointmentRef);
+      await update(appointmentRef, { meet: AppointmentStatus.CANCEL });
       console.log("Appointment cancelled successfully.");
     } catch (error) {
       console.error("Error cancelling appointment:", error);
@@ -249,11 +255,6 @@ export class UserDataService {
 export class System {
   doctorList: Doctor[] = [];
   doctorListAvailable = false;
-
-  // Mock data for doctors
-  mockList() {
-    this.doctorListAvailable = true;
-  }
   async getListDoctor(): Promise<Doctor[]> {
 
     if (this.doctorListAvailable) return this.doctorList;
@@ -262,21 +263,79 @@ export class System {
       const data = snapShot.val();
       this.doctorList = Object.values(data);
     }
-    if (this.doctorList.length === 0) {
-      this.mockList();
-      for (const doctor of this.doctorList) {
-        const doctorRef = ref(db, 'doctors/' + doctor.tag);
-        await set(doctorRef, doctor);
-      }
-    }
     return this.doctorList;
   }
   getListNumber(): number {
     return this.doctorList.length;
   }
 }
-export class DoctorDataService {
-
-}
-
 //tạo  data structure cho bác sĩ
+export class DoctorDataService {
+  private doctorID:string;
+  private appointmentList:Appointment[]=[];
+
+  constructor(doctorID:string) {
+    this.doctorID=doctorID;
+    this.fetchDoctorAppointment();
+  }
+  private async fetchDoctorAppointment()
+  {
+     const docRef = ref(db, `Doctors/${this.doctorID}/appointments`);
+     const snapShot=await get(docRef);
+    if (snapShot.exists()) {
+      const appointmentsObj = snapShot.val();
+      this.appointmentList = Object.keys(appointmentsObj).map((key) => ({
+        id: key,
+        ...appointmentsObj[key]
+      })) as Appointment[];
+    }
+  }
+  public getDoctorAppointment()
+  {
+    //for doctor view
+    return this.appointmentList;
+  }
+  public async updateDoctorAppointment(appointment: Appointment): Promise<void> {
+    try {
+      const docRef = ref(db, `Doctors/${this.doctorID}/appointments/${appointment.key}`);
+      await update(docRef, appointment);
+      console.log("Updated appointment:", appointment);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  public async doctorStatistics() {
+    try {
+      // Reference to the doctor's appointments in Realtime Database
+      const docRef = ref(db, `Doctors/${this.doctorID}/appointments`);
+      const appointmentsSnap = await get(docRef);
+
+      // Initialize statistics with default values
+      const statistics = {
+        cancel: 0,
+        meeting: 0,
+        ready: 0,
+        ended: 0,
+      };
+
+      if (appointmentsSnap.exists()) {
+        const appointments = appointmentsSnap.val();
+
+        Object.keys(appointments).forEach((appointmentId) => {
+          const appointment = appointments[appointmentId];
+          const state = appointment.AppointmentStatus;
+          if (state === AppointmentStatus.CANCEL) statistics.cancel += 1;
+          if (state === AppointmentStatus.MEETING) statistics.meeting += 1;
+          if (state === AppointmentStatus.READY) statistics.ready += 1;
+          if (state === AppointmentStatus.ENDED) statistics.ended += 1;
+        });
+      } else {
+        console.log('No appointments found for this doctor.');
+      }
+      return statistics;
+    } catch (error) {
+      console.error('Error fetching doctor statistics:', error);
+      return null;  // Handle errors
+    }
+  }
+}
