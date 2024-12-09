@@ -42,7 +42,7 @@ export class ListComponent implements OnInit {
   }
 
   async loadAppointments() {
-    this.appointments = await this.userDataService.getAppointments("");
+    this.appointments = await this.userDataService.getUserAppointments(null);
   }
 
   getStatusConfig(status: AppointmentStatus) {
@@ -70,7 +70,7 @@ export class ListComponent implements OnInit {
       }
 
       // Proceed with cancellation
-      await this.userDataService.cancelAppointment(appointment.key);
+      await this.userDataService.cancelAppointment(appointment.id);
       await this.loadAppointments();
       this.messageService.success('Appointment canceled successfully.');
     } catch (error) {

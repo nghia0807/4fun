@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AppointmentData, User, UserDataService } from '../../../data/data';
+import {AppointmentData, System, User} from '../../../data/data';
 
 @Component({
   selector: 'app-doctor-patient',
@@ -14,15 +14,18 @@ export class DoctorPatientComponent {
   drawerVisible = false;
   selectedPatient: User | null = null;
   patientAppointments: AppointmentData[] = [];
+  systemService: System;
 
-  constructor(private userDataService: UserDataService) {}
+  constructor() {
+    this.systemService=new System();
+  }
 
   async ngOnInit() {
     await this.loadPatients();
   }
 
   async loadPatients() {
-    this.patients = await this.userDataService.getAllPatients();
+    this.patients = await this.systemService.getAllPatients();
     this.filteredPatients = [...this.patients];
   }
 

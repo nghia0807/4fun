@@ -25,9 +25,8 @@ export class HistoryListComponent implements OnInit {
   }
 
   async loadHistoryAppointments() {
-    this.appointments = await this.userDataService.getAppointments("");//where is the ID?
+    this.appointments = await this.userDataService.getUserAppointments(null);//where is the ID?
   }
-
   getStatusConfig(status: AppointmentStatus) {
     return ListOfAppointmentStatus.find(item => item.value === status);
   }
