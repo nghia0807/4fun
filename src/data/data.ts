@@ -89,8 +89,8 @@ export class UserDataService {
     this.currentUser={} as User;
     this.appointmentDataService = new AppointmentDataService();
     onAuthStateChanged(auth, (user) => {
-      if (user!==null) {
-        this.fetchUserData(user.uid).then((userData) => {
+      if (user!==null&& user.email) {
+        this.fetchUserData(user.email).then((userData) => {
           this.currentUser=userData;
         });
       } else {
@@ -215,6 +215,17 @@ export class UserDataService {
       await this.appointmentDataService.updateReservedAppointment(appointment);
     }).catch((e)=>{
       console.log(e,"cannot cancel appointment,maybe appointment not found");
+    })
+  }
+  async preserveAppointment(appointmentKey: string) {
+    const docRef=doc(db,'AvailableAppointments',appointmentKey);
+    await getDoc(docRef).then(async (doc) => {
+      const appointment =doc.data() as AppointmentData;
+      appointment.createdAt=new Date().toISOString();
+      appointment.userID=this.getCurrentUserUid();
+      await this.appointmentDataService.reserveAppointment(appointment);
+    }).catch((e)=>{
+      console.error("failed to create appointment",e);
     })
   }
 }
@@ -406,6 +417,12 @@ export class AppointmentDataService
   public async reserveAppointment(appointment: AppointmentData) {
     try {
       if(!await this.checkAppointmentStats(appointment)) return;
+      if(appointment.status !== AppointmentStatus.READY)
+      {
+        console.log("appointment status is wrong");
+        return;
+      }
+      appointment.status = AppointmentStatus.PRESERVED;
       const userAppointmentsRef = doc(db, "Users", appointment.userID, "appointments", appointment.id);
       const doctorAppointmentsRef = doc(db, "Doctors", appointment.doctorID, "appointments", appointment.id);
       await setDoc(userAppointmentsRef, appointment);

@@ -15,9 +15,11 @@ export const login = (email: string, pass: string) => {
     return signInWithEmailAndPassword(auth, email, pass)
       .then((userCredential) => {
         const userID = userCredential.user;
+        const userEmail = userCredential.user.email;
         return {
           status: "success",
-          user: userID
+          user: userID.uid,
+          email: userEmail,
         };
       })
       .catch((error) => {
