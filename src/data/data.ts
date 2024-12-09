@@ -84,8 +84,10 @@ export interface AppointmentValue {
 export class UserDataService {
   private currentUser :User;
   private userDataSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
+  private appointmentDataService:AppointmentDataService;
   constructor() {
     this.currentUser={} as User;
+    this.appointmentDataService = new AppointmentDataService();
     onAuthStateChanged(auth, (user) => {
       if (user!==null) {
         this.fetchUserData(user.uid).then((userData) => {
@@ -124,6 +126,7 @@ export class UserDataService {
     });
   }
   async getUserAppointments(userID: string|null): Promise<AppointmentData[]> {
+
     if (this.currentUser === null && userID === null) {
       return [];  // Nothing exists
     }
@@ -197,18 +200,16 @@ export class UserDataService {
   }
 
   async cancelAppointment(appointmentKey: string): Promise<void> {
-    const uid = this.getCurrentUserUid();
-    const appointmentRef = doc(db, `users/${uid}/appointments`, appointmentKey);
-    try {
-      await updateDoc(appointmentRef, { status: AppointmentStatus.CANCEL });
-      console.log('Appointment cancelled successfully.');
-    } catch (error) {
-      console.error('Error cancelling appointment:', error);
-      throw error;
-    }
+    const docRef=doc(db,"User",this.getCurrentUserUid(),"appointments",appointmentKey);
+    await getDoc(docRef).then(async (doc) => {
+      const appointment = doc.data() as AppointmentData;
+      appointment.status = AppointmentStatus.CANCEL;
+      await this.appointmentDataService.updateReservedAppointment(appointment);
+    }).catch((e)=>{
+      console.log(e,"cannot cancel appointment,maybe appointment not found");
+    })
   }
 }
-
 export class System {
   doctorList: Doctor[] = [];
   doctorListAvailable = false;
@@ -262,63 +263,64 @@ export class System {
   }
 }
 export class DoctorDataService { //always call for initialize
-  private doctorID: string="";
+  private doctorID: string = "";
   private doctorAppointmentList: AppointmentData[] = [];
   appointmentDataService = new AppointmentDataService();
+
   constructor(doctorID: string) {
     //consider call initialize, or else this code will fail
     this.doctorID = doctorID;
-    this.fetchDoctorAppointment();
   }
-  async initialize()
-  {
+
+  async initialize() {
     await this.fetchDoctorAppointment();
   }
+
   private async fetchDoctorAppointment() {
     const docRef = collection(db, `Doctors/${this.doctorID}/appointments`);
-    await getDocs(docRef).then((data)=>{
+    await getDocs(docRef).then((data) => {
       data.forEach((doc) => {
-        this.doctorAppointmentList.push({id:doc.id,...doc.data()} as AppointmentData);
+        this.doctorAppointmentList.push({id: doc.id, ...doc.data()} as AppointmentData);
       })
     })
   }
+
   public getDoctorAppointment() {
     return this.doctorAppointmentList;
   }
+
   public async updateDoctorAppointment(appointment: AppointmentData): Promise<void> {
     await this.appointmentDataService.updateReservedAppointment(appointment);
   }
+
   public async doctorStatistics() {
-    try {
-      const docRef = collection(db, `Doctors/${this.doctorID}/appointments`);
-      const appointmentsSnap = await getDocs(docRef);
-      const statistics = {
-        cancel: 0,
-        meeting: 0,
-        ready: 0,
-        ended: 0,
-        preserved:0,
-      };
-      if (!appointmentsSnap.empty) {
-        const appointments = appointmentsSnap.docs.map(doc => doc.data());
-        return appointments.forEach((appointment) => {
-          const state = appointment['status'];
-          if (state === AppointmentStatus.CANCEL) statistics.cancel += 1;
-          if (state === AppointmentStatus.MEETING) statistics.meeting += 1;
-          if (state === AppointmentStatus.READY) statistics.ready += 1;
-          if (state === AppointmentStatus.ENDED) statistics.ended += 1;
-          if(state===AppointmentStatus.PRESERVED) statistics.preserved+=1;
-        });
-      } else {
-        console.log('No appointments found for this doctor.');
-      }
-    }catch (e)
-    {
-      console.error(e);
+    const statistics = {
+      cancel: 0,
+      meeting: 0,
+      ready: 0,
+      ended: 0,
+      preserved: 0,
+    };
+
+    const docRef = collection(db, `Doctors/${this.doctorID}/appointments`);
+    const appointmentsSnap = await getDocs(docRef);
+
+    if (!appointmentsSnap.empty) {
+      const appointments = appointmentsSnap.docs.map(doc => doc.data());
+      appointments.forEach((appointment) => {
+        const state = appointment['status'];
+        if (state === AppointmentStatus.CANCEL) statistics.cancel += 1;
+        if (state === AppointmentStatus.MEETING) statistics.meeting += 1;
+        if (state === AppointmentStatus.READY) statistics.ready += 1;
+        if (state === AppointmentStatus.ENDED) statistics.ended += 1;
+        if (state === AppointmentStatus.PRESERVED) statistics.preserved += 1;
+      });
     }
+
+    return statistics;
   }
 }
-export class UserInitialize{
+export class UserInitialize{// for admin only
  currentUser: User;
   constructor(currentUser: User) {
     this.currentUser=currentUser;
@@ -327,14 +329,14 @@ export class UserInitialize{
     this.currentUser={...this.currentUser,...user};
   }
   async isThisUserExist() {
-    const refUser = doc(db, `Users/${this.currentUser.email}`);
+    const refUser = doc(db, `Users/${this.currentUser.id}`);
 
     const snapShot = await getDoc(refUser);
     return !!snapShot.exists();
   }
   async pushUser() {
     if (this.currentUser !== null && !await this.isThisUserExist()) {
-      const refUser = doc(db, `Users/${this.currentUser.email}`);
+      const refUser = doc(db, `Users/${this.currentUser.id}`);
       await setDoc(refUser, this.currentUser);
       return true;
     }
@@ -344,28 +346,35 @@ export class UserInitialize{
 export class AppointmentDataService
 {
   //
-  public async createBlankAppointment(appointment: AppointmentData) {//return appointmentID
-    const docRef = doc(db, "AvailableAppointments");
-
-    await setDoc(docRef, appointment).then(()=>{
-      appointment.id =docRef.id;
-    })
-      .catch(e => console.error(e));
-    return appointment;
+  public async createBlankAppointment(appointment: AppointmentData): Promise<AppointmentData> {
+    const docRef = doc(collection(db, "AvailableAppointments"));
+    try {
+      await setDoc(docRef, appointment);
+      appointment.id = docRef.id;
+      await updateDoc(docRef,{id:appointment.id});
+      return appointment;
+    } catch (e) {
+      console.error("Error creating appointment: ", e);
+      throw new Error("Failed to create appointment");
+    }
   }
   public async updateAvailableAppointment(appointment: Partial<AppointmentData>) {
-    if (!appointment.id) {
-      console.error("Appointment ID is required to update the document");
-      return;
-    }
+
     try {
-      await updateDoc(doc(db, "AvailableAppointments", appointment.id), appointment);
-      console.log("Appointment updated successfully!");
+      if (!appointment.id || appointment.id==='') {
+        console.error("Appointment ID is required to update the document");
+        return;
+      }else
+      {
+        await updateDoc(doc(db, "AvailableAppointments", appointment.id), appointment);
+        console.log("Appointment updated successfully!");
+      }
+
     } catch (error) {
       console.error("Error updating appointment: ", error);
     }
   }
-  async checkAppointmentStats(appointment: AppointmentData) {
+  private async checkAppointmentStats(appointment: AppointmentData) {
     const appointmentDocRef = doc(db, "AvailableAppointments", appointment.id);
     const appointmentSnap = await getDoc(appointmentDocRef);
     if (!appointmentSnap.exists()) {
@@ -429,5 +438,4 @@ export class AppointmentDataService
     }
   }
 }
-
 
