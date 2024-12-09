@@ -1,7 +1,7 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { UserDataService, Appointment } from '../../../../data/data';
+import { UserDataService, AppointmentData } from '../../../../data/data';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { MainStore } from '../../main-app.component.store';
 import { NzTagModule } from 'ng-zorro-antd/tag';
@@ -15,9 +15,9 @@ import { MonitorComponent } from '../monitor.component';
   selector: 'app-list',
   standalone: true,
   imports: [
-    NzTableModule, 
-    NzPopconfirmModule, 
-    CommonModule, 
+    NzTableModule,
+    NzPopconfirmModule,
+    CommonModule,
     NzTagModule,
     NzDividerModule,
     NzMessageModule
@@ -27,7 +27,7 @@ import { MonitorComponent } from '../monitor.component';
   providers: [MainStore]
 })
 export class ListComponent implements OnInit {
-  appointments: Appointment[] = [];
+  appointments: AppointmentData[] = [];
   readonly blured$ = this.mainStore.bluredSlider$;
 
   constructor(
@@ -42,23 +42,23 @@ export class ListComponent implements OnInit {
   }
 
   async loadAppointments() {
-    this.appointments = await this.userDataService.getAppointments(false);
+    this.appointments = await this.userDataService.getUserAppointments(null);
   }
 
   getStatusConfig(status: AppointmentStatus) {
     return ListOfAppointmentStatus.find(item => item.value === status);
   }
 
-  viewAppointmentDetails(appointment: Appointment) {
+  viewAppointmentDetails(appointment: AppointmentData) {
     this.viewAppointment.openDrawer(appointment);
   }
 
-  async cancelAppointment(appointment: Appointment) {
+  async cancelAppointment(appointment: AppointmentData) {
     try {
       // Parse the appointment date
-      const appointmentDate = new Date(appointment.date);
+      const appointmentDate = new Date(appointment.appointmentDate);
       const today = new Date();
-      
+
       // Calculate the difference in days
       const timeDifference = appointmentDate.getTime() - today.getTime();
       const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
@@ -70,7 +70,7 @@ export class ListComponent implements OnInit {
       }
 
       // Proceed with cancellation
-      await this.userDataService.cancelAppointment(appointment.key);
+      await this.userDataService.cancelAppointment(appointment.id);
       await this.loadAppointments();
       this.messageService.success('Appointment canceled successfully.');
     } catch (error) {

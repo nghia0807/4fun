@@ -23,6 +23,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild(PurchaseDrawerComponent) drawerComponent!: PurchaseDrawerComponent;
   readonly role$ = this.mainStore.role$;
   public user: User = {
+    id:'',
     name: '',
     phoneNumber: '',
     email: '',
@@ -36,10 +37,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     private data: UserDataService,
     private mainStore: MainStore
-  ) { 
+  ) {
     this.data.getUserData().subscribe(userData => {
       if (userData) {
         this.user = {
+          id:userData.id||'',
           name: userData.name || '',
           phoneNumber: userData.phoneNumber || '',
           email: userData.email || '',
@@ -50,6 +52,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
       else {
         this.user = {
+          id:'',
           name: '',
           phoneNumber: '',
           email: '',
@@ -62,7 +65,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    
+
   }
 
   ngOnDestroy(): void {

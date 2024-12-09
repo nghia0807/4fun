@@ -44,7 +44,7 @@ export class DoctorAppoinmentHistoryComponent {
       patientName: 'Phạm Quang D',
       time: '2:30',
       comment: 'Điều trị viêm khớp',
-      status: AppointmentStatus.ENDING,
+      status: AppointmentStatus.ENDED,
       appointmentDate: new Date('2024-12-04T04:12:59.200Z')
     },
     {
@@ -84,7 +84,7 @@ export class DoctorAppoinmentHistoryComponent {
       patientName: 'Trần Thanh I',
       time: '12:00',
       comment: 'Xét nghiệm máu định kỳ',
-      status: AppointmentStatus.ENDING,
+      status: AppointmentStatus.ENDED,
       appointmentDate: new Date('2024-12-21T04:12:59.200Z')
     },
     {
@@ -135,12 +135,12 @@ export class DoctorAppoinmentHistoryComponent {
     this.appointments.sort((a, b) => {
       // First, compare by date
       const dateComparison = this.compareDate(a.appointmentDate, b.appointmentDate);
-      
+
       // If dates are the same, compare by time
       if (dateComparison === 0) {
         return this.compareTime(a.time, b.time);
       }
-      
+
       return dateComparison;
     });
   }

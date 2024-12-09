@@ -1,6 +1,5 @@
 // doctor-handle-appointment.component.ts
 import { Component, OnInit } from '@angular/core';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { AppointmentStatus, ListOfAppointmentStatus } from '../../../component/enum';
 import { DoctorHandleStore } from './doctor-handle.store';
 
@@ -51,7 +50,7 @@ export class DoctorHandleAppointmentComponent implements OnInit {
       patientName: 'Phạm Quang D',
       time: '2:30',
       comment: 'Điều trị viêm khớp',
-      status: AppointmentStatus.ENDING,
+      status: AppointmentStatus.ENDED,
       appointmentDate: new Date('2024-12-04T04:12:59.200Z')
     },
     {
@@ -91,7 +90,7 @@ export class DoctorHandleAppointmentComponent implements OnInit {
       patientName: 'Trần Thanh I',
       time: '12:00',
       comment: 'Xét nghiệm máu định kỳ',
-      status: AppointmentStatus.ENDING,
+      status: AppointmentStatus.ENDED,
       appointmentDate: new Date('2024-12-21T04:12:59.200Z')
     },
     {
@@ -137,7 +136,7 @@ export class DoctorHandleAppointmentComponent implements OnInit {
     // Calculate start and end indices for pagination
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    
+
     // Return sliced and sorted appointments
     return this.appointments.slice(startIndex, endIndex);
   }
@@ -146,12 +145,12 @@ export class DoctorHandleAppointmentComponent implements OnInit {
     this.appointments.sort((a, b) => {
       // First, compare by date
       const dateComparison = this.compareDate(a.appointmentDate, b.appointmentDate);
-      
+
       // If dates are the same, compare by time
       if (dateComparison === 0) {
         return this.compareTime(a.time, b.time);
       }
-      
+
       return dateComparison;
     });
   }

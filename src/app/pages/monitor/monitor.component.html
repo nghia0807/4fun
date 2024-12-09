@@ -4,18 +4,18 @@
 <div class="bottom">
     <app-history-list></app-history-list>
 </div>
-<nz-drawer 
-    [nzVisible]="visibleView" 
-    nzTitle="Appointment Details" 
+<nz-drawer
+    [nzVisible]="visibleView"
+    nzTitle="Appointment Details"
     (nzOnClose)="closeDrawer()"
     [nzWidth]="400"
 >
     <ng-container *nzDrawerContent>
         <div *ngIf="selectedAppointment">
-            <p><strong>ID:</strong> {{ selectedAppointment.key }}</p>
-            <p><strong>Doctor:</strong> {{ selectedAppointment.doctor }}</p>
-            <p><strong>Date:</strong> {{ selectedAppointment.date }}</p>
-            <p><strong>Time:</strong> {{ selectedAppointment.time }}</p>
+            <p><strong>ID:</strong> {{ selectedAppointment.id }}</p>
+            <p><strong>Doctor:</strong> {{ selectedAppointment.doctorName }}</p>
+            <p><strong>Date:</strong> {{ selectedAppointment.appointmentDate }}</p>
+            <p><strong>Time:</strong> {{ selectedAppointment.appointmentTime }}</p>
             <p>Location: Phuc Thinh hospital, 123 XYZ Street, District 1, Ho Chi Minh City</p>
             <p>If you have any questions, please feel free to contact us at 0901-234-567.</p>
         </div>

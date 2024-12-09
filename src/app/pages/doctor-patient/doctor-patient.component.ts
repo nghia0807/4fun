@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AppointmentData, User, UserDataService } from '../../../data/data';
+import {AppointmentData, System, User} from '../../../data/data';
 
 @Component({
   selector: 'app-doctor-patient',
@@ -10,19 +10,22 @@ export class DoctorPatientComponent {
   patients: User[] = [];
   filteredPatients: User[] = [];
   searchTerm: string = '';
-  
+
   drawerVisible = false;
   selectedPatient: User | null = null;
   patientAppointments: AppointmentData[] = [];
+  systemService: System;
 
-  constructor(private userDataService: UserDataService) {}
+  constructor() {
+    this.systemService=new System();
+  }
 
-  ngOnInit() {
-    this.loadPatients();
+  async ngOnInit() {
+    await this.loadPatients();
   }
 
   async loadPatients() {
-    this.patients = await this.userDataService.getAllPatients();
+    this.patients = await this.systemService.getAllPatients();
     this.filteredPatients = [...this.patients];
   }
 
@@ -30,7 +33,7 @@ export class DoctorPatientComponent {
     if (!this.searchTerm) {
       this.filteredPatients = [...this.patients];
     } else {
-      this.filteredPatients = this.patients.filter(patient => 
+      this.filteredPatients = this.patients.filter(patient =>
         patient.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         patient.phoneNumber.includes(this.searchTerm.toLowerCase())
       );

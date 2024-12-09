@@ -12,10 +12,10 @@
   <tbody>
     @for (data of basicTable.data; track data) {
     <tr>
-      <td>{{ data.key }}</td>
-      <td>{{ data.doctor }}</td>
-      <td>{{ data.date }}</td>
-      <td>{{ data.time }}</td>
+      <td>{{ data.id }}</td>
+      <td>{{ data.doctorName }}</td>
+      <td>{{ data.appointmentDate }}</td>
+      <td>{{ data.appointmentTime }}</td>
       <td>
         <nz-tag
           *ngIf="getStatusConfig(data.status)"

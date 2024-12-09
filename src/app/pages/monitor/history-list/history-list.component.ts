@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { UserDataService, Appointment } from '../../../../data/data';
+import { UserDataService, AppointmentData } from '../../../../data/data';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { AppointmentStatus, ListOfAppointmentStatus } from '../../../../component/enum';
 @Component({
@@ -16,7 +16,7 @@ import { AppointmentStatus, ListOfAppointmentStatus } from '../../../../componen
   styleUrl: './history-list.component.css'
 })
 export class HistoryListComponent implements OnInit {
-  appointments: Appointment[] = [];
+  appointments: AppointmentData[] = [];
 
   constructor(private userDataService: UserDataService) {}
 
@@ -25,9 +25,8 @@ export class HistoryListComponent implements OnInit {
   }
 
   async loadHistoryAppointments() {
-    this.appointments = await this.userDataService.getAppointments(true);
+    this.appointments = await this.userDataService.getUserAppointments(null);//where is the ID?
   }
-
   getStatusConfig(status: AppointmentStatus) {
     return ListOfAppointmentStatus.find(item => item.value === status);
   }

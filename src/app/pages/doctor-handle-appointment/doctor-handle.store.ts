@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Appointmentvalue, System, UserAppointment } from "../../../data/data";
+import { AppointmentValue, System, UserAppointment } from "../../../data/data";
 import { ComponentStore } from "../../../component/store.cp";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
@@ -10,7 +10,7 @@ export interface DoctorHandleState {
    total_appointment: number;
    appointments: UserAppointment[];
    is_meeting: boolean;
-   meeting_value: Appointmentvalue;
+   meeting_value: AppointmentValue;
 }
 
 const initialState: DoctorHandleState = {
@@ -36,7 +36,7 @@ export class DoctorHandleStore {
     readonly total_appointments$: Observable<number>;
     readonly is_meeting$: Observable<boolean>;
     readonly appointments$: Observable<UserAppointment[]>;
-    readonly meeting_value$: Observable<Appointmentvalue>;
+    readonly meeting_value$: Observable<AppointmentValue>;
 
     constructor(private system: System) {
         this.store = ComponentStore.getInstance<DoctorHandleState>(initialState);
@@ -57,7 +57,7 @@ export class DoctorHandleStore {
         this.store.patchState({is_meeting: value});
     }
 
-    setMeetingValue(value: Appointmentvalue) {
+    setMeetingValue(value: AppointmentValue) {
         this.store.patchState({ meeting_value: value});
     }
 }

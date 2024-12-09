@@ -9,12 +9,12 @@ import { AppointmentStatus } from '../../../component/enum';
 export class DoctorWelcomeComponent implements OnInit {
   selectedMonth: Date = new Date();
   monthFormat = 'yyyy/MM';
-  
+
   appointmentStatusData = [
     { status: AppointmentStatus.CANCEL, count: 10 },
     { status: AppointmentStatus.MEETING, count: 15 },
     { status: AppointmentStatus.READY, count: 20 },
-    { status: AppointmentStatus.ENDING, count: 5 }
+    { status: AppointmentStatus.ENDED, count: 5 }
   ];
 
   ngOnInit() {
@@ -26,7 +26,7 @@ export class DoctorWelcomeComponent implements OnInit {
   }
 
   get listData() {
-    //xử lí selectedMonth lọc để lấy dữ liệu 
+    //xử lí selectedMonth lọc để lấy dữ liệu
     return this.appointmentStatusData;
   }
 }

@@ -28,7 +28,8 @@ const initialState: DoctorState = {
     name: '',
     specialization: '',
     tag: '',
-    imageUrl: ''
+    imageUrl: '',
+    description:'',
   },
   initial_tag: 'all',
 };
@@ -88,7 +89,7 @@ export class DoctorStore {
   }
 
   setTotal(res: number) {
-    const total_doctors = res !== 0 ? this.system.getListNumber() : res;
+    const total_doctors = res !== 0 ? this.system.getDoctorListSize() : res;
     this.store.patchState({ total_doctors });
   }
 
