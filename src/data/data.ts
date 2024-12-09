@@ -157,7 +157,7 @@ export class UserDataService {
     comment: string
   ) {
     const appointmentId = this.generateAppointmentId(date, time, doctorId);
-    const appointmentRef = doc(db, `users/${uid}/appointments`, appointmentId);
+    const appointmentRef = doc(db, `Users/${uid}/appointments`, appointmentId);
     try {
       await setDoc(appointmentRef, {
         doctorName,
