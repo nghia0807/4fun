@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';  // Import the modular SDK correctly
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Modular auth
 import { BehaviorSubject } from 'rxjs';
 import { AppointmentStatus } from '../component/enum';
-import {onAuthStateChanged} from "@angular/fire/auth";
 import {
   collection,
   deleteDoc,
@@ -13,7 +12,7 @@ import {
   getFirestore, query,
   setDoc,
   updateDoc, where
-} from "@angular/fire/firestore";
+} from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: "AIzaSyBKbsUGLmXtM_JZfXb-iZHfIRv-PRht63o",
   authDomain: "onlineappointment-44466.firebaseapp.com",
