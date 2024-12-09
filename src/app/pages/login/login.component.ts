@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -87,11 +87,11 @@ export class LoginComponent {
       }
       login(userName, password)
         .then((result) => {
-          if (result.status === "success" && 'user' in result) {
+          if (result.status === "success" && 'email' in result && result.email) {
             this.authService.login();
             this.message.success('Login successfully');
-            this.userDataService.refreshUserData(result.user.uid);
-            
+            this.userDataService.refreshUserData(result.email);
+
             if (role === 'bs') {
               this.mainStore.setRole('bs');
               this.router.navigate(['/main-bs/welcome']);

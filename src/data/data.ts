@@ -89,8 +89,8 @@ export class UserDataService {
     this.currentUser={} as User;
     this.appointmentDataService = new AppointmentDataService();
     onAuthStateChanged(auth, (user) => {
-      if (user!==null) {
-        this.fetchUserData(user.uid).then((userData) => {
+      if (user!==null&& user.email) {
+        this.fetchUserData(user.email).then((userData) => {
           this.currentUser=userData;
         });
       } else {
