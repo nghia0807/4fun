@@ -198,11 +198,19 @@ export class UserDataService {
   public getCurrentUserName(): string {
     return this.currentUser?this.currentUser.name : "";
   }
-
   async cancelAppointment(appointmentKey: string): Promise<void> {
-    const docRef=doc(db,"User",this.getCurrentUserUid(),"appointments",appointmentKey);
+    const docRef=doc(db,"Users",this.getCurrentUserUid(),"appointments",appointmentKey);
     await getDoc(docRef).then(async (doc) => {
+
       const appointment = doc.data() as AppointmentData;
+      if(!appointment)
+      {
+        throw ("invalid retrieved appointment data");
+      }
+      if(appointment.status!==AppointmentStatus.PRESERVED)
+      {
+        throw ("appointment is not in preserve state");
+      }
       appointment.status = AppointmentStatus.CANCEL;
       await this.appointmentDataService.updateReservedAppointment(appointment);
     }).catch((e)=>{
