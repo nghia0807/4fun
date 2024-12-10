@@ -32,7 +32,7 @@
         <!-- <td>{{ data.id }}</td> -->
         <td>{{ data.patientName }}</td>
         <td>{{ data.time }}</td>
-        <td>{{ formatDate(data.appointmentDate) }}</td>
+        <td>{{ formatDate(data.date) }}</td>
         <td style="width: 100px;">
           <nz-tag
             *ngIf="getStatusConfig(data.status)"

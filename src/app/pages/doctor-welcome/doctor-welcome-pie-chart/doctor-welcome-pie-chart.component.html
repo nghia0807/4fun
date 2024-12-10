@@ -1,6 +1,12 @@
 <div class="chart-container">
   <div class="chart-wrapper">
-    <svg width="500" height="500" viewBox="0 0 300 300">
+    <nz-empty 
+    style="padding-top: 100px;"
+      *ngIf="isEmpty" 
+      [nzNotFoundImage]="'simple'"
+      nzNotFoundContent="No appointment data available"
+    ></nz-empty>
+    <svg *ngIf="!isEmpty"  width="500" height="500" viewBox="0 0 300 300">
       <g *ngFor="let slice of chartData" 
          [attr.transform]="'translate(150, 150)'">
         <path 

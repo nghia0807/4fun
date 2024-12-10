@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppointmentStatus } from '../../../component/enum';
+import { AppointmentStatusData, DoctorDataService } from '../../../data/doctor.service';
 
 @Component({
   selector: 'app-doctor-welcome',
@@ -10,23 +11,35 @@ export class DoctorWelcomeComponent implements OnInit {
   selectedMonth: Date = new Date();
   monthFormat = 'yyyy/MM';
   
-  appointmentStatusData = [
-    { status: AppointmentStatus.CANCEL, count: 10 },
-    { status: AppointmentStatus.MEETING, count: 15 },
-    { status: AppointmentStatus.READY, count: 20 },
-    { status: AppointmentStatus.ENDING, count: 5 }
-  ];
+  // Change to use an array instead of a Promise
+  appointmentStatusData: AppointmentStatusData[] = [];
+
+  constructor(
+    private service: DoctorDataService
+  ) {}
 
   ngOnInit() {
     this.selectedMonth = new Date();
+    this.loadAppointmentStatusData();
+  }
+
+  async loadAppointmentStatusData() {
+    try {
+      this.appointmentStatusData = await this.service.getAppointmentStatusCount(undefined, this.selectedMonth);
+    } catch (error) {
+      console.error('Error loading appointment status data:', error);
+      this.appointmentStatusData = [];
+    }
   }
 
   onMonthChange(date: Date) {
     this.selectedMonth = date;
+    this.loadAppointmentStatusData();
   }
 
-  get listData() {
-    //xử lí selectedMonth lọc để lấy dữ liệu 
-    return this.appointmentStatusData;
+  get listData(): AppointmentStatusData[] {
+    return this.appointmentStatusData.filter(item => {
+      return true;
+    });
   }
 }

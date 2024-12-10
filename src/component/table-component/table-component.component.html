@@ -1,0 +1,31 @@
+<nz-table
+  #basicTable
+  [nzData]="displayData"
+  [nzPageSize]="pageSize"
+  [nzPageIndex]="currentPage"
+  [nzTotal]="totalData.length"
+  [nzShowTotal]="totalTemplate"
+  [nzShowSizeChanger]="true"
+  (nzPageIndexChange)="onPageIndexChange($event)"
+  (nzPageSizeChange)="onPageSizeChange($event)"
+>
+  <thead>
+    <tr>
+      <th *ngFor="let header of headers">{{ header }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of displayData">
+      <td *ngFor="let header of headers">
+        <ng-container *ngIf="header === 'Status'; else defaultCell">
+          <ng-content></ng-content>
+        </ng-container>
+        <ng-template #defaultCell>
+          {{ item[transformHeaderKey(header)] }}
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+
+<ng-template #totalTemplate let-total> Tổng {{ total }} dòng </ng-template>

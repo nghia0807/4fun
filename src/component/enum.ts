@@ -1,16 +1,10 @@
 export enum AppointmentStatus {
     CANCEL = 'CANCEL',
-    MEETING = 'MEETING',
     READY = 'READY',
     ENDING = 'ENDING'
 }
 
 export const ListOfAppointmentStatus = [
-    {
-        label: 'In meeting',
-        value: AppointmentStatus.MEETING,
-        color: 'green',
-    },
     {
         label: 'Ending',
         value: AppointmentStatus.ENDING,

@@ -31,6 +31,8 @@ import { TimePickerComponent } from '../doctor/time-picker/time-picker.component
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { DoctorAppoinmentHistoryComponent } from './doctor-appoinment-history.component';
+import { System } from '../../../data/data';
+import { DoctorDataService } from '../../../data/doctor.service';
 const NzModules = [
   NzPaginationModule,
   NzLayoutModule,
@@ -76,6 +78,7 @@ const NzModules = [
         component: DoctorAppoinmentHistoryComponent,
       },
     ]),
-  ]
+  ],
+  providers: [ DoctorDataService]
 })
 export class DoctorAppoinmentHistoryModule { }

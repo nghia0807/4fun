@@ -17,7 +17,16 @@ export interface Appointment {
   status: AppointmentStatus
 }
 
+export interface DoctorAppointment {
+  id: string;
+  patientName: string;
+  time: string;
+  date: Date;
+  status: AppointmentStatus;
+}
+
 export interface User {
+  id: string;
   name: string;
   phoneNumber: string;
   email: string;
@@ -52,7 +61,7 @@ export interface UserAppointment {
 
 //use for the drawer
 export interface Appointmentvalue {
-  id: number;
+  id: string;
   patientName: string;
   birth: Date;
   address: string;
@@ -86,29 +95,32 @@ export class UserDataService {
       const snapshot = await get(patientsRef);
       if (snapshot.exists()) {
         const users = snapshot.val() as Record<string, any>;
-        return Object.entries(users).map(([uid, userData]) => ({
-          uid,
-          name: userData.name || '',
-          phoneNumber: userData.phoneNumber || '',
-          email: userData.email || '',
-          address: userData.address || '',
-          turn: 0, // Adding turn to match User interface
-          appointments: userData.appointments 
-            ? Object.entries(userData.appointments)
-              .filter(([_, appointmentData]) => typeof appointmentData === 'object')
-              .map(([key, appointmentData]) => {
-                const appointment = appointmentData as AppointmentData;
-                return {
-                  key,
-                  doctorName: appointment.doctorName || '',
-                  appointmentDate: appointment.appointmentDate || '',
-                  appointmentTime: appointment.appointmentTime || '',
-                  createdAt: appointment.createdAt || '',
-                  healthCondition: appointment.healthCondition || ''
-                };
-              })
-            : []
-        })) as User[];
+        return Object.entries(users)
+          .filter(([_, userData]) => !userData.id)
+          .map(([uid, userData]) => ({
+            uid,
+            id: '',
+            name: userData.name || '',
+            phoneNumber: userData.phoneNumber || '',
+            email: userData.email || '',
+            address: userData.address || '',
+            turn: 0, // Adding turn to match User interface
+            appointments: userData.appointments
+              ? Object.entries(userData.appointments)
+                .filter(([_, appointmentData]) => typeof appointmentData === 'object')
+                .map(([key, appointmentData]) => {
+                  const appointment = appointmentData as AppointmentData;
+                  return {
+                    key,
+                    doctorName: appointment.doctorName || '',
+                    appointmentDate: appointment.appointmentDate || '',
+                    appointmentTime: appointment.appointmentTime || '',
+                    createdAt: appointment.createdAt || '',
+                    healthCondition: appointment.healthCondition || ''
+                  };
+                })
+              : []
+          })) as User[];
       }
       return [];
     } catch (error) {
@@ -137,9 +149,9 @@ export class UserDataService {
     this.fetchUserData(uid)
   }
 
-  async getAppointments(includeHistory: boolean = false): Promise<Appointment[]> {
+  async getAppointments(): Promise<Appointment[]> {
     const uid = this.getCurrentUserUid();
-    const appointmentsRef = ref(db, `users/${uid}/appointments`);
+    const appointmentsRef = ref(db, `appointments`);
 
     try {
       const snapshot = await get(appointmentsRef);
@@ -147,26 +159,47 @@ export class UserDataService {
 
       const now = new Date();
       return Object.entries(snapshot.val() || {})
-        .filter(([_, appointmentData]: [string, any]) => {
-          const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
-          const isPastAppointment = appointmentDateTime < now;
-          return includeHistory ? isPastAppointment : !isPastAppointment;
-        })
+        .filter(([_, appointmentData]: [string, any]) =>
+          appointmentData.uid === uid &&
+          (appointmentData.status != 'END' && appointmentData.status != 'CANCEL')
+        )
         .map(([key, appointmentData]: [string, any]) => {
-          const appointmentDateTime = this.combineDateTime(appointmentData.appointmentDate, appointmentData.appointmentTime);
-          const isPastAppointment = appointmentDateTime < now;
-
-          if (isPastAppointment && !appointmentData.meet) {
-            this.markAppointmentAsMet(uid, key);
-          }
-
           return {
             key,
             doctor: appointmentData.doctorName,
             date: new Date(appointmentData.appointmentDate).toLocaleDateString(),
             time: appointmentData.appointmentTime,
-            meet: isPastAppointment,
-            status: AppointmentStatus.MEETING
+            status: appointmentData.status
+          };
+        });
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      return [];
+    }
+  }
+
+  async getAppointmentsHistory(): Promise<Appointment[]> {
+    const uid = this.getCurrentUserUid();
+    const appointmentsRef = ref(db, `appointments`);
+
+    try {
+      const snapshot = await get(appointmentsRef);
+      if (!snapshot.exists()) return [];
+
+      const now = new Date();
+      return Object.entries(snapshot.val() || {})
+        .filter(([_, appointmentData]: [string, any]) =>
+          appointmentData.uid === uid &&
+          (appointmentData.status != 'READY' && appointmentData.status != 'MEETING')
+
+        )
+        .map(([key, appointmentData]: [string, any]) => {
+          return {
+            key,
+            doctor: appointmentData.doctorName,
+            date: new Date(appointmentData.appointmentDate).toLocaleDateString(),
+            time: appointmentData.appointmentTime,
+            status: appointmentData.status
           };
         });
     } catch (error) {
@@ -192,22 +225,27 @@ export class UserDataService {
   }
 
   createAppointment(uid: string, doctorId: string, doctorName: string, time: string, date: Date, healthCondition: string) {
-    const appointmentId = this.generateAppointmentId(date, time, doctorId);
-    const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentId}`);
+    const appointmentId = this.generateAppointmentId(date, time, doctorId)
+    const globalAppointmentRef = ref(db, `appointments/${appointmentId}`);
 
-    return set(appointmentRef, {
+    const appointmentData = {
       doctorName: doctorName,
+      doctorId: doctorId,
+      uid: uid,
       appointmentTime: time,
       appointmentDate: date.toISOString(),
       healthCondition: healthCondition,
-      createdAt: new Date().toISOString()
-    })
+      createdAt: new Date().toISOString(),
+      status: AppointmentStatus.READY
+    };
+
+    return Promise.all([
+      set(globalAppointmentRef, appointmentData)
+    ])
       .then(() => {
-        console.log("Appointment created successfully.");
-        return appointmentId; // Return the new appointment ID
+        return appointmentId;
       })
       .catch((error) => {
-        console.error("Error creating appointment:", error);
         throw error;
       });
   }
@@ -220,6 +258,10 @@ export class UserDataService {
     const doctorNamePart = doctorName.replace(/\s+/g, '').toUpperCase();
 
     return `${doctorNamePart}${year}${month}${day}${hours}${minutes}`;
+  }
+
+  public getDoctorId(): string {
+    return this.currentUser.id;
   }
 
   public getCurrentUserUid(): string {
@@ -236,12 +278,12 @@ export class UserDataService {
 
   async cancelAppointment(appointmentKey: string): Promise<void> {
     const uid = this.getCurrentUserUid();
-    const appointmentRef = ref(db, `users/${uid}/appointments/${appointmentKey}`);
+    const appointmentRef = ref(db, `appointments/${appointmentKey}`);
     try {
-      await remove(appointmentRef);
-      console.log("Appointment cancelled successfully.");
+      await update(appointmentRef, {
+        status: AppointmentStatus.CANCEL
+      });
     } catch (error) {
-      console.error("Error cancelling appointment:", error);
       throw error;
     }
   }
@@ -255,28 +297,34 @@ export class System {
     this.doctorListAvailable = true;
   }
   async getListDoctor(): Promise<Doctor[]> {
-
     if (this.doctorListAvailable) return this.doctorList;
+
     const snapShot = await get(ref(db, 'doctors'));
     if (snapShot.exists()) {
-      const data = snapShot.val();
-      this.doctorList = Object.values(data);
+      const data = snapShot.val() as Record<string, Record<string, Doctor>>;
+      this.doctorList = Object.entries(data)
+        .flatMap(([tag, doctors]) =>
+          Object.values(doctors).map(doctor => ({
+            ...doctor,
+            tag
+          }))
+        );
     }
+
     if (this.doctorList.length === 0) {
       this.mockList();
       for (const doctor of this.doctorList) {
-        const doctorRef = ref(db, 'doctors/' + doctor.tag);
+        const doctorRef = ref(db, `doctors/${doctor.tag}/${doctor.id}`);
         await set(doctorRef, doctor);
       }
     }
+
     return this.doctorList;
   }
   getListNumber(): number {
     return this.doctorList.length;
   }
 }
-export class DoctorDataService {
 
-}
 
 //tạo  data structure cho bác sĩ

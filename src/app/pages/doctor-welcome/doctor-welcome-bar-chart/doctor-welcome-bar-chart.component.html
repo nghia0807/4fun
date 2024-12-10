@@ -1,6 +1,14 @@
 <div class="bar-chart-container">
   <div class="chart-wrapper">
-    <svg width="600" height="320" viewBox="0 0 400 250">
+    <!-- Show Empty state when there's no data -->
+    <nz-empty 
+      *ngIf="isEmpty" 
+      [nzNotFoundImage]="'simple'"
+      nzNotFoundContent="No appointment data available"
+    ></nz-empty>
+
+    <!-- Regular SVG Chart when there's data -->
+    <svg *ngIf="!isEmpty" width="600" height="320" viewBox="0 0 400 250">
       <!-- X-Axis -->
       <line x1="50" y1="200" x2="350" y2="200" stroke="#ddd" stroke-width="2" />
 

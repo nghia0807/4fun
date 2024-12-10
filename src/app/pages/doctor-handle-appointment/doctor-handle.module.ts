@@ -32,7 +32,10 @@ import { DoctorHandleAppointmentComponent } from './doctor-handle-appointment.co
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { DoctorHandleFormComponent } from './doctor-handle-form/doctor-handle-form.component';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+
 const NzModules = [
+  NzPopconfirmModule,
   NzPaginationModule,
   NzLayoutModule,
   NzImageModule,
@@ -77,6 +80,6 @@ const NzModules = [
         component: DoctorHandleAppointmentComponent,
       },
     ]),
-  ]
+  ],
 })
 export class DoctorHandleAppointmentModule { }

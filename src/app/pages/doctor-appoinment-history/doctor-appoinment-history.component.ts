@@ -1,112 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AppointmentStatus, ListOfAppointmentStatus } from '../../../component/enum';
-interface Appointment {
-  id: number;
-  patientName: string;
-  time: string;
-  comment: string;
-  status: AppointmentStatus;
-  appointmentDate: Date;
-}
+import { DoctorAppointmentHistoryStore } from './doctor-appointment-history.store';
+import { DoctorAppointment } from '../../../data/data';
+import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-doctor-appoinment-history',
   templateUrl: './doctor-appoinment-history.component.html',
-  styleUrl: './doctor-appoinment-history.component.css'
+  styleUrl: './doctor-appoinment-history.component.css',
+  providers: [DoctorAppointmentHistoryStore]
 })
-export class DoctorAppoinmentHistoryComponent {
-  appointments: Appointment[] = [
-    {
-      id: 1,
-      patientName: 'Nguyễn Văn A',
-      time: '10:00',
-      comment: 'Đau đầu và sốt nhẹ',
-      status: AppointmentStatus.CANCEL,
-      appointmentDate: new Date('2024-11-26T04:12:59.200Z')
-    },
-    {
-      id: 2,
-      patientName: 'Trần Thị B',
-      time: '11:30',
-      comment: 'Kiểm tra sức khỏe định kỳ',
-      status: AppointmentStatus.READY,
-      appointmentDate: new Date('2024-12-26T04:12:59.200Z')
-    },
-    {
-      id: 3,
-      patientName: 'Lê Minh C',
-      time: '1:00',
-      comment: 'Khám tim mạch',
-      status: AppointmentStatus.MEETING,
-      appointmentDate: new Date('2024-12-01T04:12:59.200Z')
-    },
-    {
-      id: 4,
-      patientName: 'Phạm Quang D',
-      time: '2:30',
-      comment: 'Điều trị viêm khớp',
-      status: AppointmentStatus.ENDING,
-      appointmentDate: new Date('2024-12-04T04:12:59.200Z')
-    },
-    {
-      id: 5,
-      patientName: 'Ngô Thị E',
-      time: '9:00',
-      comment: 'Kiểm tra sức khỏe tổng quát',
-      status: AppointmentStatus.READY,
-      appointmentDate: new Date('2024-12-03T04:12:59.200Z')
-    },
-    {
-      id: 6,
-      patientName: 'Bùi Đức F',
-      time: '3:00',
-      comment: 'Khám da liễu',
-      status: AppointmentStatus.CANCEL,
-      appointmentDate: new Date('2024-12-02T04:12:59.200Z')
-    },
-    {
-      id: 7,
-      patientName: 'Hoàng Thị G',
-      time: '4:30',
-      comment: 'Khám phụ khoa',
-      status: AppointmentStatus.MEETING,
-      appointmentDate: new Date('2024-12-10T04:12:59.200Z')
-    },
-    {
-      id: 8,
-      patientName: 'Vũ Minh H',
-      time: '8:30',
-      comment: 'Chăm sóc răng miệng',
-      status: AppointmentStatus.READY,
-      appointmentDate: new Date('2024-12-11T04:12:59.200Z')
-    },
-    {
-      id: 9,
-      patientName: 'Trần Thanh I',
-      time: '12:00',
-      comment: 'Xét nghiệm máu định kỳ',
-      status: AppointmentStatus.ENDING,
-      appointmentDate: new Date('2024-12-21T04:12:59.200Z')
-    },
-    {
-      id: 10,
-      patientName: 'Đặng Hữu J',
-      time: '5:00 PM',
-      comment: 'Thăm khám mắt',
-      status: AppointmentStatus.MEETING,
-      appointmentDate: new Date('2024-12-12T04:12:59.200Z')
-    },
-    {
-      id: 11,
-      patientName: 'Đặng Hữu J',
-      time: '5:00',
-      comment: 'Thăm khám mắt',
-      status: AppointmentStatus.MEETING,
-      appointmentDate: new Date('2024-12-11T04:12:59.200Z')
-    }
-  ];
+export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
+  appointments: DoctorAppointment[] = [];
   selectedMonth: Date = new Date();
   monthFormat = 'yyyy/MM';
-
+  private appointmentSubscription: Subscription = new Subscription();
+  ngOnInit() {
+    this.appointmentSubscription = this.store.appointments$.subscribe(appointments => {
+      this.appointments = this.sortAppointments(appointments || []);
+      this.total = Math.ceil(this.appointments.length / this.pageSize);
+    });
+  }
+  ngOnDestroy(): void {
+    if (this.appointmentSubscription) {
+      this.appointmentSubscription.unsubscribe();
+    } 
+  }
   formatDate(dateString: Date): string {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
@@ -123,20 +42,27 @@ export class DoctorAppoinmentHistoryComponent {
     this.pageIndex = pageIndex;
   }
 
-  get paginatedAppointments(): Appointment[] {
-    this.sortAppointments();
+  get paginatedAppointments(): DoctorAppointment[] {
+    // Ensure appointments is defined and is an array
+    if (!this.appointments || !Array.isArray(this.appointments)) {
+      return []; // Return an empty array if appointments is undefined or not an array
+    }
+  
+    // Recalculate total pages based on current appointments
+    this.total = Math.ceil(this.appointments.length / this.pageSize);
+  
+    // Calculate start and end indices for pagination
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    //xử lí lọc theo selectedMonth
-    return this.appointments.slice(startIndex, endIndex);
+    
+    // Return sliced appointments, handling cases where endIndex might exceed array length
+    return this.appointments.slice(startIndex, Math.min(endIndex, this.appointments.length));
   }
 
-  sortAppointments() {
-    this.appointments.sort((a, b) => {
+  sortAppointments(appointments: DoctorAppointment[]): DoctorAppointment[] {
+    return [...appointments].sort((a, b) => {
       // First, compare by date
-      const dateComparison = this.compareDate(a.appointmentDate, b.appointmentDate);
-      
-      // If dates are the same, compare by time
+      const dateComparison = this.compareDate(a.date, b.date);
       if (dateComparison === 0) {
         return this.compareTime(a.time, b.time);
       }
@@ -165,12 +91,12 @@ export class DoctorAppoinmentHistoryComponent {
 
 
   constructor(
+    private store: DoctorAppointmentHistoryStore
+  ) {
+    this.store.appointments$.subscribe(s => this.appointments = s)
+   }
 
-  ) { }
-
-  ngOnInit() {
-
-  }
+  
 
   getStatusConfig(status: AppointmentStatus) {
     return ListOfAppointmentStatus.find(item => item.value === status);

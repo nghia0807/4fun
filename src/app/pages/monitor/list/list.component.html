@@ -1,43 +1,69 @@
-<nz-table #basicTable [nzData]="appointments">
-  <thead>
-    <tr>
-      <th>Key</th>
-      <th>Doctor</th>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (data of basicTable.data; track data) {
-    <tr>
-      <td>{{ data.key }}</td>
-      <td>{{ data.doctor }}</td>
-      <td>{{ data.date }}</td>
-      <td>{{ data.time }}</td>
-      <td>
-        <nz-tag
-          *ngIf="getStatusConfig(data.status)"
-          [nzColor]="getStatusConfig(data.status)?.color"
-        >
-          {{ getStatusConfig(data.status)?.label }}
-        </nz-tag>
-      </td>
-      <td>
-        <a (click)="viewAppointmentDetails(data)">View</a>
-        <nz-divider nzType="vertical"></nz-divider>
-        <a
-          nz-popconfirm
-          nzPopconfirmTitle="Are you sure you want to cancel this appointment?"
-          nzPopconfirmPlacement="bottom"
-          (nzOnConfirm)="cancelAppointment(data)"
-          [nzOkDisabled]="(blured$ | async) === true ? true: undefined"
-        >
-          Cancel
-        </a>
-      </td>
-    </tr>
-    }
-  </tbody>
-</nz-table>
+<div>
+  <nz-table
+    #basicTable
+    nzSize="small"
+    [nzData]="paginatedAppointments"
+    [nzPageSize]="5"
+    [nzShowPagination]="false"
+  >
+    <thead>
+      <tr class="empty-row">
+        <th>Key</th>
+        <th>Doctor</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (data of basicTable.data; track data) {
+      <tr class="empty-row">
+        <td>{{ data.key }}</td>
+        <td>{{ data.doctor }}</td>
+        <td>{{ data.date }}</td>
+        <td>{{ data.time }}</td>
+        <td>
+          <nz-tag
+            *ngIf="getStatusConfig(data.status)"
+            [nzColor]="getStatusConfig(data.status)?.color"
+          >
+            {{ getStatusConfig(data.status)?.label }}
+          </nz-tag>
+        </td>
+        <td>
+          <a (click)="viewAppointmentDetails(data)">View</a>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a
+            nz-popconfirm
+            nzPopconfirmTitle="Are you sure you want to cancel this appointment?"
+            nzPopconfirmPlacement="bottom"
+            (nzOnConfirm)="cancelAppointment(data)"
+            [nzOkDisabled]="(blured$ | async) === true ? true : undefined"
+          >
+            Cancel
+          </a>
+        </td>
+      </tr>
+      }@for (emptyRow of getEmptyRows(5 - basicTable.data.length); track
+      emptyRow) {
+      <tr class="empty-row">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      }
+    </tbody>
+  </nz-table>
+  <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+    <nz-pagination
+      [nzPageIndex]="pageIndex"
+      [nzTotal]="appointments.length || 0"
+      [nzPageSize]="pageSize"
+      (nzPageIndexChange)="onPageIndexChange($event)"
+    >
+    </nz-pagination>
+  </div>
+</div>

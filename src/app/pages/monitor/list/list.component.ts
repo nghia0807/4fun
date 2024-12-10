@@ -10,7 +10,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { AppointmentStatus, ListOfAppointmentStatus } from '../../../../component/enum';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { MonitorComponent } from '../monitor.component';
-
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 @Component({
   selector: 'app-list',
   standalone: true,
@@ -20,7 +20,8 @@ import { MonitorComponent } from '../monitor.component';
     CommonModule, 
     NzTagModule,
     NzDividerModule,
-    NzMessageModule
+    NzMessageModule,
+    NzPaginationModule
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css'],
@@ -29,7 +30,14 @@ import { MonitorComponent } from '../monitor.component';
 export class ListComponent implements OnInit {
   appointments: Appointment[] = [];
   readonly blured$ = this.mainStore.bluredSlider$;
-
+  pageSize = 5; // Số items trên mỗi trang
+  total = 0;
+  pageIndex = 1; // Trang hiện tại
+  get paginatedAppointments(): Appointment[] {
+    const startIndex = (this.pageIndex - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    return this.appointments.slice(startIndex, endIndex);
+  }
   constructor(
     private userDataService: UserDataService,
     private mainStore: MainStore,
@@ -39,10 +47,17 @@ export class ListComponent implements OnInit {
 
   async ngOnInit() {
     await this.loadAppointments();
+    this.updateTotal();
   }
 
+  updateTotal() {
+    this.total = this.appointments.length;
+  }
+
+
   async loadAppointments() {
-    this.appointments = await this.userDataService.getAppointments(false);
+    this.appointments = await this.userDataService.getAppointments();
+    this.updateTotal();
   }
 
   getStatusConfig(status: AppointmentStatus) {
@@ -77,5 +92,11 @@ export class ListComponent implements OnInit {
       console.error('Error cancelling appointment:', error);
       this.messageService.error('Failed to cancel appointment. Please try again.');
     }
+  }
+  getEmptyRows(count: number): any[] {
+    return new Array(count).fill(null);
+  }
+  onPageIndexChange(pageIndex: number) {
+    this.pageIndex = pageIndex;
   }
 }

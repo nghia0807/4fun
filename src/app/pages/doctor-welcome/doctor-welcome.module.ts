@@ -31,7 +31,10 @@ import { TimePickerComponent } from '../doctor/time-picker/time-picker.component
 import { DoctorWelcomeComponent } from './doctor-welcome.component';
 import { DoctorWelcomePieChartComponent } from './doctor-welcome-pie-chart/doctor-welcome-pie-chart.component';
 import { DoctorWelcomeBarChartComponent } from './doctor-welcome-bar-chart/doctor-welcome-bar-chart.component';
+import { DoctorDataService } from '../../../data/doctor.service';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 const NzModules = [
+  NzEmptyModule,
   NzImageModule,
   NzIconModule,
   NzDividerModule,
@@ -75,6 +78,6 @@ const NzModules = [
       },
     ]),
   ],
-  providers: [DecimalPipe]
+  providers: [DecimalPipe, DoctorDataService]
 })
 export class DoctorWelcomeModule { }

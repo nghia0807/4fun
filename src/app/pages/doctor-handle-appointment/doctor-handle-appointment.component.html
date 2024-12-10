@@ -1,11 +1,14 @@
 <div style="margin: 15px">
   <div class="table-title-container mb-4">
-    <h2 class="text-xl font-semibold">Appointment List <nz-date-picker
-      style="float: right; margin: 10px"
-      nzMode="month"
-      [(ngModel)]="selectedMonth"
-      [nzFormat]="monthFormat"
-    ></nz-date-picker></h2>
+    <h2 class="text-xl font-semibold">
+      Appointment List
+      <!-- <nz-date-picker
+        style="float: right; margin: 10px"
+        nzMode="month"
+        [(ngModel)]="selectedMonth"
+        [nzFormat]="monthFormat"
+      ></nz-date-picker> -->
+    </h2>
   </div>
 
   <nz-table
@@ -16,7 +19,7 @@
   >
     <thead>
       <tr>
-        <!-- <th>Key</th> -->
+        <th>Key</th>
         <th>Patient Name</th>
         <th>Date</th>
         <th>Time</th>
@@ -27,10 +30,10 @@
     <tbody>
       @for (data of basicTable.data; track data) {
       <tr>
-        <!-- <td>{{ data.id }}</td> -->
+        <td>{{ data.id }}</td>
         <td>{{ data.patientName }}</td>
         <td>{{ data.time }}</td>
-        <td>{{ formatDate(data.appointmentDate) }}</td>
+        <td>{{ formatDate(data.date) }}</td>
         <td style="width: 150px">
           <nz-tag
             *ngIf="getStatusConfig(data.status)"
@@ -40,8 +43,16 @@
           </nz-tag>
         </td>
         <td style="width: 300px">
-          <a nz-button nzType="text" (click)="openMeeting()">In Meeting</a>
-          <a nz-button nzType="text" nzDanger>Cancle appointment</a>
+          <a nz-button nzType="text" (click)="openMeeting(data.id)">In Meeting</a>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a
+            nz-popconfirm
+            nzPopconfirmTitle="Are you sure you want to cancel this appointment?"
+            nzPopconfirmPlacement="bottom"
+            (nzOnConfirm)="cancelAppointment(data.id)"
+          >
+          Cancle appointment
+          </a>
         </td>
         } @for (emptyRow of getEmptyRows(7 - basicTable.data.length); track
         emptyRow) {
@@ -56,10 +67,10 @@
       }
     </tbody>
   </nz-table>
-  <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+  <div style="display: flex; float: right; margin-top: 10px">
     <nz-pagination
       [nzPageIndex]="pageIndex"
-      [nzTotal]="appointments.length"
+      [nzTotal]="appointments.length || 0"
       [nzPageSize]="pageSize"
       (nzPageIndexChange)="onPageIndexChange($event)"
     >

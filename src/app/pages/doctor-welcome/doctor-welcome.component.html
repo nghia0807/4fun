@@ -4,6 +4,7 @@
   nzMode="month"
   [(ngModel)]="selectedMonth"
   [nzFormat]="monthFormat"
+  (ngModelChange)="onMonthChange($event)"
 ></nz-date-picker>
 <div style="display: flex; flex-direction: row; justify-content: space-around">
   <app-doctor-welcome-pie-chart

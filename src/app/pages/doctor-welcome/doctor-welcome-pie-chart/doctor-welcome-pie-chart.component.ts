@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { AppointmentStatus } from '../../../../component/enum';
 interface AppointmentStatusData {
   status: AppointmentStatus;
@@ -11,10 +11,10 @@ interface AppointmentStatusData {
 })
 export class DoctorWelcomePieChartComponent {
   @Input() appointments: AppointmentStatusData[] = [];
+  isEmpty: boolean = false;
 
   private readonly STATUS_LABELS = {
     [AppointmentStatus.CANCEL]: 'Cancelled Appointments',
-    [AppointmentStatus.MEETING]: 'Ongoing Meetings',
     [AppointmentStatus.READY]: 'Ready for Meeting',
     [AppointmentStatus.ENDING]: 'Ending Soon'
   };
@@ -22,7 +22,6 @@ export class DoctorWelcomePieChartComponent {
   chartData: any[] = [];
   private readonly COLORS = {
     [AppointmentStatus.CANCEL]: '#FF6384',
-    [AppointmentStatus.MEETING]: '#36A2EB',
     [AppointmentStatus.READY]: '#4CAF50',
     [AppointmentStatus.ENDING]: '#FFA500'
   };
@@ -31,8 +30,20 @@ export class DoctorWelcomePieChartComponent {
     this.generatePieChart();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['appointments']) {
+      this.generatePieChart();
+    }
+  }
+
   generatePieChart() {
     const totalCount = this.appointments.reduce((sum, item) => sum + item.count, 0);
+    if (this.appointments.length === 0 || this.appointments.every(a => a.count === 0)) {
+      this.chartData = [];
+      this.isEmpty = true;
+      return;
+    }
+    this.isEmpty = false;
     let startAngle = 0;
 
     this.chartData = this.appointments.map((item) => {

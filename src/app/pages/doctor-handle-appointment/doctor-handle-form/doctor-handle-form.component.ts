@@ -11,6 +11,7 @@ import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 export class DoctorHandleFormComponent {
   readonly visible$ = this.store.is_meeting$;
   form = new UntypedFormGroup({
+    id: new UntypedFormControl(null),
     patientName: new UntypedFormControl({ value: null, disabled: true }),
     birth: new UntypedFormControl({ value: null, disabled: true }),
     appointmentDate: new UntypedFormControl({ value: null, disabled: true }),
@@ -57,7 +58,7 @@ export class DoctorHandleFormComponent {
 
   submit() {
     this.store.setIsMeeting(false);
-    // Implement submission logic
+    this.store.endMeeting(this.form.get('id')?.value);
   }
 
   // Modal methods
@@ -66,8 +67,9 @@ export class DoctorHandleFormComponent {
   }
 
   handleCancel() {
-    this.isCancelModalVisible = false;
+    this.store.cancelMeeting(this.form.get('id')?.value);
     this.cancelForm.reset();
+    this.isCancelModalVisible = false;
     this.isOtherReasonSelected = false;
   }
 
@@ -89,7 +91,6 @@ export class DoctorHandleFormComponent {
 
   submitCancel() {
     const selectedReasons = this.cancelForm.value;
-    console.log('Selected cancellation reasons:', selectedReasons);
     this.store.setIsMeeting(false);
     // Implement cancellation logic
     this.handleCancel();
