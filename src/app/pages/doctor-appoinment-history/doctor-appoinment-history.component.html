@@ -2,12 +2,13 @@
   <div class="table-title-container mb-4">
     <h2 class="text-xl font-semibold">
       Appointment History
-      <nz-date-picker
+      <!-- <nz-date-picker
         style="float: right; margin: 10px"
         nzMode="month"
         [(ngModel)]="selectedMonth"
         [nzFormat]="monthFormat"
-      ></nz-date-picker>
+        (ngModelChange)="onDateFilter($event)"
+      ></nz-date-picker> -->
     </h2>
   </div>
 
@@ -33,7 +34,7 @@
         <td>{{ data.patientName }}</td>
         <td>{{ data.time }}</td>
         <td>{{ formatDate(data.date) }}</td>
-        <td style="width: 100px;">
+        <td style="width: 100px">
           <nz-tag
             *ngIf="getStatusConfig(data.status)"
             [nzColor]="getStatusConfig(data.status)?.color"

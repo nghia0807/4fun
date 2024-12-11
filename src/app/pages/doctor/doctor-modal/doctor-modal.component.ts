@@ -17,6 +17,7 @@ import { Subject } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { EmailVerificationService } from '../../../../component/email';
 import { HeaderComponent } from '../../header/header.component';
+import { MainStore } from '../../main-app.component.store';
 
 interface TimeAndDateSelection {
   time: string;
@@ -41,7 +42,7 @@ interface TimeAndDateSelection {
   ],
   templateUrl: './doctor-modal.component.html',
   styleUrl: './doctor-modal.component.css',
-  providers: [DoctorStore, System, UserDataService, TimePickerComponent]
+  providers: [DoctorStore, System, UserDataService, TimePickerComponent, HeaderComponent]
 })
 export class DoctorModalComponent implements OnInit, OnDestroy {
   readonly visible$ = this.store.is_modal$;
@@ -49,7 +50,7 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private valueSubscription?: Subscription;
   doctor: string = '';
-  doctorId: string ='';
+  doctorId: string = '';
   @ViewChild(TimePickerComponent) timePickerComponent!: TimePickerComponent;
 
   form = new UntypedFormGroup({
@@ -64,6 +65,8 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
     private message: NzMessageService,
     private userDataService: UserDataService,
     private emailVerificationService: EmailVerificationService,
+    private header: HeaderComponent,
+    private turn: MainStore
   ) { }
 
   ngOnInit() {
@@ -136,12 +139,13 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
           concatMap(() => {
             const uid = this.userDataService.getCurrentUserUid();
             if (formData.selectedDate) {
-              return this.userDataService.createAppointment(uid,this.doctorId, this.doctor, formData.selectedTime, formData.selectedDate, formData.comment);
+              return this.userDataService.createAppointment(uid, this.doctorId, this.doctor, formData.selectedTime, formData.selectedDate, formData.comment);
             } else {
               throw new Error('Selected date is null');
             }
           }),
           concatMap((appointmentId) => {
+            // this.turn.setTurn();
             const email = this.userDataService.getCurrentUserEmail();
             const name = this.userDataService.getCurrentUserName();
             this.emailVerificationService.sendAppointmentEmail(
@@ -155,12 +159,18 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
             return this.message.success('Appointment registered successfully', { nzDuration: 2500 }).onClose!;
           }),
           catchError((error) => {
-            console.error('Error creating appointment:', error);
+            switch (error.message) {
+              case 'No turns available':
+                this.message.error('You do not have enough turns to book an appointment');
+                break;
+              default:
+                this.message.error('Failed to register appointment. Please try again.');
+            }
             return this.message.error('Failed to register appointment', { nzDuration: 2500 }).onClose!;
           })
         )
         .subscribe(() => {
-          console.log('Registration process completed');
+          this.turn.setTurn();
         });
       this.onClose();
     } else {

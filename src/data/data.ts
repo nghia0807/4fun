@@ -31,7 +31,6 @@ export interface User {
   phoneNumber: string;
   email: string;
   address: string;
-  turn: number;
   appointments: AppointmentData[]
 }
 
@@ -77,7 +76,9 @@ export class UserDataService {
   private currentUser: any = null;
   private userDataSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
-  constructor() {
+  constructor(
+
+  ) {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.currentUser = user;
@@ -143,6 +144,33 @@ export class UserDataService {
 
   getUserData() {
     return this.userDataSubject.asObservable();
+  }
+
+  public async userData(): Promise<User | null> {
+    const uid = this.getCurrentUserUid();
+
+    if (!uid) {
+      return null;
+    }
+
+    try {
+      const userRef = ref(db, `users/${uid}`);
+      const snapshot = await get(userRef);
+
+      if (snapshot.exists()) {
+        const userData = snapshot.val() as User;
+        // Update the current user and notify subscribers
+        this.currentUser = { ...this.currentUser, ...userData };
+        this.userDataSubject.next(this.currentUser);
+
+        return userData;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
   }
 
   refreshUserData(uid: string) {
@@ -224,9 +252,18 @@ export class UserDataService {
     return dateTime;
   }
 
-  createAppointment(uid: string, doctorId: string, doctorName: string, time: string, date: Date, healthCondition: string) {
+  async createAppointment(uid: string, doctorId: string, doctorName: string, time: string, date: Date, healthCondition: string) {
+    // Ensure turn is a valid number
+    const currentTurn = await this.getTurn() || 0;
+
+    // Check if turn is a valid number and greater than 0
+    if (!Number.isInteger(currentTurn) || currentTurn <= 0) {
+      throw new Error('No turns available');
+    }
+
     const appointmentId = this.generateAppointmentId(date, time, doctorId)
     const globalAppointmentRef = ref(db, `appointments/${appointmentId}`);
+    const userRef = ref(db, `users/${uid}`);
 
     const appointmentData = {
       doctorName: doctorName,
@@ -240,12 +277,22 @@ export class UserDataService {
     };
 
     return Promise.all([
-      set(globalAppointmentRef, appointmentData)
+      set(globalAppointmentRef, appointmentData),
+      update(userRef, { turn: Math.max(0, currentTurn - 1) }) // Ensure turn never goes below 0
     ])
-      .then(() => {
+      .then(async () => {
+        // Safely update local user data
+        if (this.currentUser) {
+          this.currentUser.turn = Math.max(0, currentTurn - 1);
+          this.userDataSubject.next(this.currentUser);
+          
+          // Fetch latest user data to ensure complete synchronization
+          await this.userData();
+        }
         return appointmentId;
       })
       .catch((error) => {
+        console.error('Appointment creation error:', error);
         throw error;
       });
   }
@@ -265,7 +312,30 @@ export class UserDataService {
   }
 
   public getCurrentUserUid(): string {
+    if (!this.currentUser) {
+      console.warn('No current user found');
+      return ''; // Or throw an error
+    }
     return this.currentUser.uid;
+  }
+  
+  public async getTurn(): Promise<number> {
+    try {
+      const uid = this.getCurrentUserUid();
+      if (!uid) {
+        return 0; // Or handle this case appropriately
+      }
+  
+      const usersRef = ref(db, `users/${uid}`);
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
+        return snapshot.val().turn || 0;
+      }
+      return 0;
+    } catch (error) {
+      console.error('Error fetching turn:', error);
+      return 0;
+    }
   }
 
   public getCurrentUserEmail(): string {
@@ -283,6 +353,20 @@ export class UserDataService {
       await update(appointmentRef, {
         status: AppointmentStatus.CANCEL
       });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addTurn(value: number): Promise<void> {
+    const uid = this.getCurrentUserUid();
+    const userRef = ref(db, `users/${uid}`);
+    try {
+      const safeValue = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+      await update(userRef, {
+        turn: safeValue
+      });
+      await this.userData();
     } catch (error) {
       throw error;
     }

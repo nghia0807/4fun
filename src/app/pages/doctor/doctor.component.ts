@@ -20,6 +20,7 @@ import { WelcomeComponent } from '../welcome/welcome.component';
 import { WelcomeFormComponent } from '../welcome/welcome-form/welcome-form.component';
 import { MainStore } from '../main-app.component.store';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-doctor',
@@ -40,7 +41,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
   ],
   templateUrl: './doctor.component.html',
   styleUrl: './doctor.component.css',
-  providers: [System, UserDataService, DoctorStore, DoctorModalComponent, TimePickerComponent]
+  providers: [System, UserDataService, DoctorStore, DoctorModalComponent, TimePickerComponent, HeaderComponent]
 })
 export class DoctorComponent implements OnInit {
   @ViewChild(DoctorModalComponent) formComponent!: DoctorModalComponent;

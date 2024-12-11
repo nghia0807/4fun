@@ -7,6 +7,8 @@ import { TimePickerComponent } from '../../doctor/time-picker/time-picker.compon
 import { Doctor } from '../../../../data/data';
 import { EmailVerificationService } from '../../../../component/email';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { HeaderComponent } from '../../header/header.component';
+import { MainStore } from '../../main-app.component.store';
 interface TimeAndDateSelection {
   time: string;
   date: Date;
@@ -17,7 +19,7 @@ interface TimeAndDateSelection {
   selector: 'app-welcome-form',
   templateUrl: './welcome-form.component.html',
   styleUrl: './welcome-form.component.css',
-  providers: [System, UserDataService, DoctorStore, TimePickerComponent],
+  providers: [System, UserDataService, DoctorStore, TimePickerComponent, HeaderComponent],
 })
 export class WelcomeFormComponent implements OnInit {
   currentPage = 1;
@@ -53,7 +55,9 @@ export class WelcomeFormComponent implements OnInit {
     private timePicker: TimePickerComponent,
     private userDataService: UserDataService,
     private emailVerificationService: EmailVerificationService,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private header: HeaderComponent,
+    private turn: MainStore
   ) {
   }
 
@@ -173,14 +177,12 @@ export class WelcomeFormComponent implements OnInit {
         ...this.form.value,
         selectedDoctorFullName: this.selectedDoctorFullName
       };
-
+  
       try {
-        // Assuming you have access to the current user's UID and email
-        const userName = this.userDataService.getCurrentUserName(); // Replace with actual user name retrieval
+        const userName = this.userDataService.getCurrentUserName();
         const uid = this.userDataService.getCurrentUserUid();
         const userEmail = this.userDataService.getCurrentUserEmail();
-
-        // Create the appointment
+  
         const appointmentId = await this.userDataService.createAppointment(
           uid,
           this.selectedDoctor!,
@@ -189,8 +191,7 @@ export class WelcomeFormComponent implements OnInit {
           formData.selectedDate,
           formData.comment
         );
-
-        // Send appointment confirmation email
+  
         const emailSent = await this.emailVerificationService.sendAppointmentEmail(
           userEmail,
           userName,
@@ -199,21 +200,35 @@ export class WelcomeFormComponent implements OnInit {
           formData.selectedTime,
           this.selectedDoctorFullName!
         );
-
+  
         if (emailSent) {
           this.message.success('Appointment registered successfully');
           this.isVisible = false;
           this.steps = 0;
           this.resetForm();
+          this.turn.setTurn();
           this.timePicker.clearSelections();
         } else {
-          this.message.error('Failed to register appointment');
-          // You might want to handle this case differently
+          this.message.error('Failed to send confirmation email');
         }
       } catch (error) {
+        if (error instanceof Error) {
+          switch (error.message) {
+            case 'No turns available':
+              this.message.error('You do not have enough turns to book an appointment');
+              break;
+            default:
+              this.message.error('Failed to register appointment. Please try again.');
+              console.error(error);
+          }
+        } else {
+          this.message.error('An unexpected error occurred');
+          console.error(error);
+        }
       }
     } else {
       this.markAllControlsAsDirty();
+      this.message.error('Please fill out all required fields correctly');
     }
   }
 

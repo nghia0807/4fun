@@ -24,7 +24,7 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.appointmentSubscription) {
       this.appointmentSubscription.unsubscribe();
-    } 
+    }
   }
   formatDate(dateString: Date): string {
     const date = new Date(dateString);
@@ -47,14 +47,14 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
     if (!this.appointments || !Array.isArray(this.appointments)) {
       return []; // Return an empty array if appointments is undefined or not an array
     }
-  
+
     // Recalculate total pages based on current appointments
     this.total = Math.ceil(this.appointments.length / this.pageSize);
-  
+
     // Calculate start and end indices for pagination
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    
+
     // Return sliced appointments, handling cases where endIndex might exceed array length
     return this.appointments.slice(startIndex, Math.min(endIndex, this.appointments.length));
   }
@@ -66,7 +66,7 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
       if (dateComparison === 0) {
         return this.compareTime(a.time, b.time);
       }
-      
+
       return dateComparison;
     });
   }
@@ -94,9 +94,9 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
     private store: DoctorAppointmentHistoryStore
   ) {
     this.store.appointments$.subscribe(s => this.appointments = s)
-   }
+  }
 
-  
+
 
   getStatusConfig(status: AppointmentStatus) {
     return ListOfAppointmentStatus.find(item => item.value === status);
@@ -106,4 +106,11 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
     return new Array(count).fill(null);
   }
 
+
+  // In your component
+  onDateFilter(value: Date) {
+    // Create a new Date object to ensure a clean reference
+    const filterDate = new Date(value);
+    this.store.setFilter(filterDate);
+  }
 }

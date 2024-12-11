@@ -3,6 +3,7 @@ import { ComponentStore } from "../../component/store.cp";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { combineLatest } from "rxjs";
+import { UserDataService } from "../../data/data";
 
 
 export interface PageState {
@@ -10,6 +11,7 @@ export interface PageState {
   bluredHeader: boolean;
   bluredContent: boolean;
   bluredSlider: boolean;
+  turn: number; 
 }
 
 const initialState: PageState = {
@@ -17,6 +19,7 @@ const initialState: PageState = {
   bluredHeader: false,
   bluredContent: false,
   bluredSlider: false,
+  turn: 0,
 };
 
 @Injectable({
@@ -29,21 +32,32 @@ export class MainStore {
   readonly bluredHeader$: Observable<boolean>;
   readonly bluredSlider$: Observable<boolean>;
   readonly bluredContent$: Observable<boolean>;
+  readonly turn$: Observable<number>;
 
-  constructor() {
+  constructor(
+    private data: UserDataService
+  ) {
     this.store = ComponentStore.getInstance<PageState>(initialState);
     this.role$ = this.store.select(s => s.role);
     this.bluredHeader$ = this.store.select(s => s.bluredHeader);
     this.bluredContent$ = this.store.select(s => s.bluredContent);
     this.bluredSlider$ = this.store.select(s => s.bluredSlider);
     this.role = this.role.bind(this);
+    this.turn$ = this.store.select(s => s.turn);
     this.initialize();
   }
 
-  private initialize() {
+  private async initialize() {
     if (!this.initialized) {
       this.initialized = true;
+      await this.setTurn();
     }
+  }
+
+  
+  async setTurn() {
+    const value = await this.data.getTurn();
+    this.store.patchState({turn: value})
   }
 
   role = (): string => {

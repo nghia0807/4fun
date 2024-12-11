@@ -5,11 +5,12 @@ import { MainAppComponent } from '../main-app.component';
 import { System } from '../../../data/data';
 import { DoctorStore } from '../doctor/doctor.store';
 import { TimePickerComponent } from '../doctor/time-picker/time-picker.component';
+import { HeaderComponent } from '../header/header.component';
 @Component({
   selector: 'app-welcome',
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.css',
-  providers: [MainStore, WelcomeFormComponent, DoctorStore, TimePickerComponent]
+  providers: [MainStore, WelcomeFormComponent, DoctorStore, TimePickerComponent, HeaderComponent]
 })
 export class WelcomeComponent {
   @ViewChild(WelcomeFormComponent) formComponent!: WelcomeFormComponent;

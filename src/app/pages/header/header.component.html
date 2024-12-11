@@ -3,7 +3,7 @@
     <span
       nz-tooltip
       nzTooltipTitle="This is a number of turn that you can book a doctor."
-      >{{ user.turn + " turn" }}
+      >{{ (turn$ | async) }} turn
       <span nz-icon nzType="account-book" nzTheme="twotone"></span>
     </span>
     <a nz-button nzType="text" style="margin-left: 10px" (click)="openDrawer()">
@@ -12,25 +12,25 @@
   </div>
   <div class="user-info">
     <a nz-dropdown [nzDropdownMenu]="menu">
-      {{ user.name }} <i nz-icon nzType="down"></i>
+      {{ (user$ | async)?.name }} <i nz-icon nzType="down"></i>
     </a>
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
         <li nz-menu-item>
           <i nz-icon nzType="user" nzTheme="outline"></i>
-          {{ user.name }}
+          {{ (user$ | async)?.name }}
         </li>
         <li nz-menu-item>
           <i nz-icon nzType="phone" nzTheme="outline"></i>
-          {{ user.phoneNumber }}
+          {{ (user$ | async)?.phoneNumber }}
         </li>
         <li nz-menu-item>
           <i nz-icon nzType="mail" nzTheme="outline"></i>
-          {{ user.email }}
+          {{ (user$ | async)?.email }}
         </li>
         <li nz-menu-item>
           <i nz-icon nzType="home" nzTheme="outline"></i>
-          {{ user.address }}
+          {{ (user$ | async)?.address }}
         </li>
       </ul>
     </nz-dropdown-menu>
