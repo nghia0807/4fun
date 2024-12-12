@@ -11,14 +11,16 @@ export interface DoctorHandleState {
     total_appointment: number;
     appointments: DoctorAppointment[];
     is_meeting: boolean;
-    filter: Date
+    filter: Date;
+    filterId: string;
 }
 
 const initialState: DoctorHandleState = {
     total_appointment: 0,
     appointments: [],
     is_meeting: false,
-    filter: new Date()
+    filter: new Date(),
+    filterId: '',
 };
 
 @Injectable({
@@ -26,39 +28,59 @@ const initialState: DoctorHandleState = {
 })
 export class DoctorAppointmentHistoryStore {
     private store: ComponentStore<DoctorHandleState>;
-    private initialized = false;
+    
     readonly total_appointments$: Observable<number>;
     readonly is_meeting$: Observable<boolean>;
     readonly appointments$: Observable<DoctorAppointment[]>;
     readonly filter$: Observable<Date>;
+    readonly filterId$: Observable<string>;
+    
     constructor(
         private system: System,
-        private doctorStore: DoctorDataService) {
-        this.initialize();
+        private doctorStore: DoctorDataService
+    ) {
         this.store = ComponentStore.getInstance<DoctorHandleState>(initialState);
+        
         this.filter$ = this.store.select(s => s.filter);
+        this.filterId$ = this.store.select(s => s.filterId);
         this.total_appointments$ = this.store.select(state => state.total_appointment);
         this.is_meeting$ = this.store.select(state => state.is_meeting);
-        this.appointments$ = this.store.select(state => state.appointments);
+        
+        // Create a filtered appointments observable
+        this.appointments$ = this.store.select(state => {
+            const appointments = state.appointments;
+            const filterId = state.filterId;
+            return this.filterAppointments(appointments, filterId);
+        });
+
+        // Initial data fetch
+        this.setData();
     }
 
-    private async initialize() {
-        if (!this.initialized) {
-            this.initialized = true;
-            this.filter$.subscribe(filter => {
-                this.setData(filter);
-            });
-        }
+    private filterAppointments(appointments: DoctorAppointment[], filterId: string): DoctorAppointment[] {
+        if (!filterId) return appointments;
+        const lowerCaseFilterId = filterId.toLowerCase(); // Chuyển về chữ thường để tìm kiếm không phân biệt hoa thường
+        return appointments.filter(appointment => 
+            appointment.id.toLowerCase().includes(lowerCaseFilterId)
+        );
+    }
+    
 
+    setFilterId(value: string) {
+        this.store.patchState({ filterId: value });
     }
 
     setFilter(value: Date) {
         this.store.patchState({ filter: value });
     }
 
-    async setData(filter: Date) {
-        const data: DoctorAppointment[] = await this.doctorStore.getAppointmentsHistory(filter);
-        this.store.patchState({ appointments: data });
+    async setData() {
+        try {
+            const data: DoctorAppointment[] = await this.doctorStore.getAppointmentsHistory();
+            this.store.patchState({ appointments: data });
+        } catch (error) {
+            console.error('Error fetching appointments:', error);
+        }
     }
 
     setIsMeeting(value: boolean) {

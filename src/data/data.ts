@@ -218,7 +218,7 @@ export class UserDataService {
       return Object.entries(snapshot.val() || {})
         .filter(([_, appointmentData]: [string, any]) =>
           appointmentData.uid === uid &&
-          (appointmentData.status != 'READY' && appointmentData.status != 'MEETING')
+          (appointmentData.status != 'READY')
 
         )
         .map(([key, appointmentData]: [string, any]) => {

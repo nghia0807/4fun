@@ -120,38 +120,32 @@ export class DoctorDataService {
     const uid = this.doctorId;
     const usersRef = ref(db, `users`);
     const appointmentsRef = ref(db, `appointments`);
-  
+
     try {
       const snapshot = await get(appointmentsRef);
       const userShot = await get(usersRef);
-      
-      // Early return if no data exists
       if (!snapshot.exists() && !userShot.exists()) return [];
-      
       const userData = userShot.val() || {};
-      const appointmentsData = snapshot.val() || {};
-  
-      return Object.entries(appointmentsData)
+
+      return Object.entries(snapshot.val() || {})
         .filter(([_, appointmentData]: [string, any]) => {
-          // Strict checks for doctor and status
+          // Check doctor ID
           const isCorrectDoctor = appointmentData.doctorId === uid;
+
+          // Check status exclusion
           const isValidStatus = appointmentData.status !== 'READY';
-  
-          // Enhanced month filtering with more robust date handling
+
+          // Check month filter if provided
           const appointmentDate = new Date(appointmentData.appointmentDate);
           const isCorrectMonth = !filterMonth || (
             appointmentDate.getFullYear() === filterMonth.getFullYear() &&
             appointmentDate.getMonth() === filterMonth.getMonth()
           );
-  
-          // Combine all filtering conditions
-          return isCorrectDoctor && 
-                 isValidStatus && 
-                 isCorrectMonth;
+
+          return isCorrectDoctor && isValidStatus && isCorrectMonth;
         })
         .map(([key, appointmentData]: [string, any]) => {
           const patientName = userData[appointmentData.uid]?.name || 'Unknown Patient';
-          
           return {
             id: key,
             patientName: patientName,
@@ -161,7 +155,7 @@ export class DoctorDataService {
           };
         });
     } catch (error) {
-      console.error("Error fetching appointments history:", error);
+      console.error("Error fetching appointments:", error);
       return [];
     }
   }

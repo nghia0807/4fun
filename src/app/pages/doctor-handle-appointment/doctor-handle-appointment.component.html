@@ -43,16 +43,7 @@
           </nz-tag>
         </td>
         <td style="width: 300px">
-          <a nz-button nzType="text" (click)="openMeeting(data.id)">In Meeting</a>
-          <nz-divider nzType="vertical"></nz-divider>
-          <a
-            nz-popconfirm
-            nzPopconfirmTitle="Are you sure you want to cancel this appointment?"
-            nzPopconfirmPlacement="bottom"
-            (nzOnConfirm)="cancelAppointment(data.id)"
-          >
-          Cancle appointment
-          </a>
+          <a nz-button nzType="link" (click)="openMeeting(data.id)">Make a appointment</a>
         </td>
         } @for (emptyRow of getEmptyRows(7 - basicTable.data.length); track
         emptyRow) {

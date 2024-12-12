@@ -3,6 +3,7 @@ import { AppointmentStatus, ListOfAppointmentStatus } from '../../../component/e
 import { DoctorAppointmentHistoryStore } from './doctor-appointment-history.store';
 import { DoctorAppointment } from '../../../data/data';
 import { Subscription } from 'rxjs';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-doctor-appoinment-history',
@@ -15,7 +16,11 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
   selectedMonth: Date = new Date();
   monthFormat = 'yyyy/MM';
   private appointmentSubscription: Subscription = new Subscription();
+  form = new UntypedFormGroup({
+    search_text: new UntypedFormControl(null)
+  })
   ngOnInit() {
+    this.store.setFilterId('');
     this.appointmentSubscription = this.store.appointments$.subscribe(appointments => {
       this.appointments = this.sortAppointments(appointments || []);
       this.total = Math.ceil(this.appointments.length / this.pageSize);
@@ -54,8 +59,6 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
     // Calculate start and end indices for pagination
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-
-    // Return sliced appointments, handling cases where endIndex might exceed array length
     return this.appointments.slice(startIndex, Math.min(endIndex, this.appointments.length));
   }
 
@@ -93,7 +96,7 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
   constructor(
     private store: DoctorAppointmentHistoryStore
   ) {
-    this.store.appointments$.subscribe(s => this.appointments = s)
+    this.store.appointments$.subscribe(s => this.appointments = s);
   }
 
 
@@ -113,4 +116,9 @@ export class DoctorAppoinmentHistoryComponent implements OnInit, OnDestroy {
     const filterDate = new Date(value);
     this.store.setFilter(filterDate);
   }
+
+  search(){
+    this.store.setFilterId(this.form.get('search_text')?.value);
+  }
+
 }

@@ -5,10 +5,16 @@
       <!-- <nz-date-picker
         style="float: right; margin: 10px"
         nzMode="month"
-        [(ngModel)]="selectedMonth"
         [nzFormat]="monthFormat"
-        (ngModelChange)="onDateFilter($event)"
       ></nz-date-picker> -->
+      <form nz-form [formGroup]="form">
+        <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton" style="float: right; margin: 10px; width: 300px;">
+          <input type="text" formControlName="search_text" nz-input placeholder="input search text" />
+        </nz-input-group>
+        <ng-template #suffixButton>
+          <button nz-button nzType="primary" (click)="search()" nzSize="large" nzSearch>Search</button>
+        </ng-template>
+      </form>
     </h2>
   </div>
 
@@ -20,7 +26,7 @@
   >
     <thead>
       <tr>
-        <!-- <th>Key</th> -->
+        <th>Key</th>
         <th>Patient Name</th>
         <th>Date</th>
         <th>Time</th>
@@ -30,7 +36,7 @@
     <tbody>
       @for (data of basicTable.data; track data) {
       <tr class="empty-row">
-        <!-- <td>{{ data.id }}</td> -->
+        <td>{{ data.id }}</td>
         <td>{{ data.patientName }}</td>
         <td>{{ data.time }}</td>
         <td>{{ formatDate(data.date) }}</td>
