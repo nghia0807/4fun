@@ -16,7 +16,7 @@ export class DoctorWelcomePieChartComponent {
   private readonly STATUS_LABELS = {
     [AppointmentStatus.CANCEL]: 'Cancelled Appointments',
     [AppointmentStatus.READY]: 'Ready for Meeting',
-    [AppointmentStatus.ENDING]: 'Ending'
+    [AppointmentStatus.ENDING]: 'Ended Appointments'
   };
 
   chartData: any[] = [];
