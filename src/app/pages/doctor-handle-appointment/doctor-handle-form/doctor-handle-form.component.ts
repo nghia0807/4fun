@@ -65,6 +65,9 @@ export class DoctorHandleFormComponent {
   showCancelModal() {
     this.isCancelModalVisible = true;
   }
+  onClose() {
+    this.store.setIsMeeting(false);
+  }
 
   handleCancel() {
     this.store.cancelMeeting(this.form.get('id')?.value);

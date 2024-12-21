@@ -189,7 +189,7 @@ export class UserDataService {
       return Object.entries(snapshot.val() || {})
         .filter(([_, appointmentData]: [string, any]) =>
           appointmentData.uid === uid &&
-          (appointmentData.status != 'END' && appointmentData.status != 'CANCEL')
+          (appointmentData.status != 'ENDING' && appointmentData.status != 'CANCEL')
         )
         .map(([key, appointmentData]: [string, any]) => {
           return {
@@ -285,7 +285,7 @@ export class UserDataService {
         if (this.currentUser) {
           this.currentUser.turn = Math.max(0, currentTurn - 1);
           this.userDataSubject.next(this.currentUser);
-          
+
           // Fetch latest user data to ensure complete synchronization
           await this.userData();
         }
@@ -318,14 +318,14 @@ export class UserDataService {
     }
     return this.currentUser.uid;
   }
-  
+
   public async getTurn(): Promise<number> {
     try {
       const uid = this.getCurrentUserUid();
       if (!uid) {
         return 0; // Or handle this case appropriately
       }
-  
+
       const usersRef = ref(db, `users/${uid}`);
       const snapshot = await get(usersRef);
       if (snapshot.exists()) {
@@ -407,6 +407,38 @@ export class System {
   }
   getListNumber(): number {
     return this.doctorList.length;
+  }
+  async getDisabledTimes(doctorId: string): Promise<string[]> {
+    const db = getDatabase();
+    const appointmentsRef = ref(db, 'appointments');
+    
+    try {
+      const snapshot = await get(appointmentsRef);
+      if (!snapshot.exists()) return [];
+  
+      const appointments = snapshot.val();
+      const disabledTimes: string[] = [];
+  
+      // Filter and process appointments
+      Object.keys(appointments)
+        .filter(key => key.startsWith(doctorId)) // Filter appointments for specific doctor
+        .forEach(key => {
+          // Extract date and time from the appointment key
+          // Format: doctorId(xx) + yymmdd + hhmm
+          const dateStr = key.substring(2, 8);  // yymmdd
+          const timeStr = key.substring(8, 12); // hhmm
+          
+          // Convert to required format: 'yymmdd hh:mm'
+          const formattedTime = `${dateStr} ${timeStr.substring(0, 2)}:${timeStr.substring(2, 4)}`;
+          
+          disabledTimes.push(formattedTime);
+        });
+  
+      return disabledTimes;
+    } catch (error) {
+      console.error("Error fetching disabled times:", error);
+      return [];
+    }
   }
 }
 

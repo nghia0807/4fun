@@ -4,7 +4,7 @@
     nzTitle="You are registering with {{ data.name }}"
     (nzOnClose)="onClose()"
     nzPlacement="bottom"
-    [nzClosable]="false"
+    [nzClosable]="true"
     [nzHeight]="'calc(100vh - 56px)'"
     [nzFooter]="footerTpl"
   >
@@ -28,6 +28,7 @@
         <h3>Pick a time that you could make an appointment:</h3>
         <app-time-picker
           (timeAndDateSelected)="onTimeAndDateSelected($event)"
+          [disabledTimeStrings]="(timeDisable$ | async) || []"
         ></app-time-picker>
       </form>
     </ng-container>
@@ -36,7 +37,14 @@
         <button nz-button (click)="onClose()" style="margin-right: 8px">
           Cancel
         </button>
-        <button nz-button nzType="primary" (click)="submitAppointment()" [disabled]="form.invalid">Submit</button>
+        <button
+          nz-button
+          nzType="primary"
+          (click)="submitAppointment()"
+          [disabled]="form.invalid"
+        >
+          Submit
+        </button>
       </div>
     </ng-template>
   </nz-drawer>

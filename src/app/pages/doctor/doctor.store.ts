@@ -11,6 +11,7 @@ export interface DoctorState {
   search_data: string;
   data: Doctor[];
   is_modal: boolean;
+  timeDisable: string[];
   modal_value: Doctor
   total_doctors: number;
   initial_tag: string;
@@ -18,6 +19,7 @@ export interface DoctorState {
 
 const initialState: DoctorState = {
   total_doctors: 0,
+  timeDisable: [],
   filter_tag: 'all',
   filter_search: '',
   search_data: '',
@@ -47,12 +49,14 @@ export class DoctorStore {
   readonly filter_search$: Observable<string>;
   readonly search_data$: Observable<string>;
   readonly is_modal$: Observable<boolean>;
+  readonly timeDisable$: Observable<string[]>;
   readonly filteredDoctors$: Observable<Doctor[]>;
-
+  id: string = '';
 
   constructor(private system: System) {
     this.store = ComponentStore.getInstance<DoctorState>(initialState);
     this.initial_tag$ = this.store.select(s => s.initial_tag);
+    this.timeDisable$ = this.store.select(s => s.timeDisable);
     this.total_doctors$ = this.store.select(s => s.total_doctors);
     this.data$ = this.store.select(state => state.data);
     this.filter_tag$ = this.store.select(state => state.filter_tag);
@@ -83,7 +87,8 @@ export class DoctorStore {
     }
   }
 
-  setModalValue(value: Doctor) {
+  async setModalValue(value: Doctor) {
+    await this.setTimeDisable(value.id);
     this.store.patchState({ modal_value: value})
   }
 
@@ -94,6 +99,11 @@ export class DoctorStore {
 
   setInitialTag(value: string) {
     this.store.patchState({ initial_tag: value });
+  }
+
+  async setTimeDisable(id: string) {
+    const timeDisable: string[] = await this.system.getDisabledTimes(id);
+    this.store.patchState({timeDisable});
   }
 
   async setData() {

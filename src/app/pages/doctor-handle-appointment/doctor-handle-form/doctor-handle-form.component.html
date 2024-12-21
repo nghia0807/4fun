@@ -3,6 +3,8 @@
   nzPlacement="bottom"
   [nzHeight]="'calc(100vh - 56px)'"
   [nzFooter]="footerTpl"
+  nzClosable="true"
+  (nzOnClose)="onClose()"
 >
   <ng-container *nzDrawerContent>
     <div style="display: flex; gap: 10px">

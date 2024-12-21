@@ -49,6 +49,7 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
   readonly form_value$ = this.store.modal_value$;
   private destroy$ = new Subject<void>();
   private valueSubscription?: Subscription;
+  readonly timeDisable$ = this.store.timeDisable$;
   doctor: string = '';
   doctorId: string = '';
   @ViewChild(TimePickerComponent) timePickerComponent!: TimePickerComponent;
@@ -67,7 +68,9 @@ export class DoctorModalComponent implements OnInit, OnDestroy {
     private emailVerificationService: EmailVerificationService,
     private header: HeaderComponent,
     private turn: MainStore
-  ) { }
+  ) {
+    
+  }
 
   ngOnInit() {
     localStorage.removeItem('selectedDate');
